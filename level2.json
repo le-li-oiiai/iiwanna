@@ -12,205 +12,454 @@
       "y": 480,
       "w": 560,
       "h": 60,
-      "hitboxes": []
+      "ow": 560,
+      "oh": 60,
+      "ox": 0,
+      "oy": 480,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 560,
+      "targetH": 60,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 720,
       "y": 480,
       "w": 480,
       "h": 60,
-      "hitboxes": []
+      "ow": 480,
+      "oh": 60,
+      "ox": 720,
+      "oy": 480,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 480,
+      "targetH": 60,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 1400,
       "y": 480,
       "w": 600,
       "h": 60,
-      "hitboxes": []
+      "ow": 600,
+      "oh": 60,
+      "ox": 1400,
+      "oy": 480,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 600,
+      "targetH": 60,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 2150,
       "y": 480,
       "w": 550,
       "h": 60,
-      "hitboxes": []
+      "ow": 550,
+      "oh": 60,
+      "ox": 2150,
+      "oy": 480,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 550,
+      "targetH": 60,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
-      "x": 3920,
+      "x": 2900,
       "y": 480,
-      "w": 80,
+      "w": 700,
       "h": 60,
-      "hitboxes": []
-    },
-    {
-      "x": 250,
-      "y": 380,
-      "w": 120,
-      "h": 18,
+      "ow": 700,
+      "oh": 60,
+      "ox": 2900,
+      "oy": 480,
       "hitboxes": [
         {
           "x": -10,
           "y": -10,
-          "w": 140,
-          "h": 38,
+          "w": 720,
+          "h": 80,
           "isRelative": true,
+          "triggerCount": 0,
+          "resetOnDeath": true,
           "triggerMove": false,
+          "triggerMorph": false,
+          "triggerVisibility": false,
+          "triggerSlow": false,
+          "triggerFast": false,
+          "triggerBounce": true
+        }
+      ],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 700,
+      "targetH": 60,
+      "targetOffX": 0,
+      "targetOffY": 0
+    },
+    {
+      "x": 3800,
+      "y": 480,
+      "w": 200,
+      "h": 60,
+      "ow": 200,
+      "oh": 60,
+      "ox": 3800,
+      "oy": 480,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 200,
+      "targetH": 60,
+      "targetOffX": 0,
+      "targetOffY": 0
+    },
+    {
+      "x": 240,
+      "y": 400,
+      "w": 130,
+      "h": 20,
+      "ow": 130,
+      "oh": 20,
+      "ox": 240,
+      "oy": 400,
+      "hitboxes": [
+        {
+          "x": -10,
+          "y": -10,
+          "w": 150,
+          "h": 40,
+          "isRelative": true,
+          "triggerCount": 0,
+          "resetOnDeath": true,
+          "triggerMove": false,
+          "triggerMorph": false,
           "triggerVisibility": true,
           "triggerSlow": false,
           "triggerFast": false,
           "triggerBounce": false
         }
-      ]
+      ],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 130,
+      "targetH": 20,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 400,
       "y": 300,
       "w": 110,
       "h": 18,
-      "hitboxes": []
+      "ow": 110,
+      "oh": 18,
+      "ox": 400,
+      "oy": 300,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 110,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 600,
       "y": 400,
       "w": 90,
       "h": 18,
+      "ow": 90,
+      "oh": 18,
+      "ox": 600,
+      "oy": 400,
       "hitboxes": [
         {
-          "x": -10,
+          "x": 0,
           "y": -10,
-          "w": 110,
-          "h": 38,
+          "w": 90,
+          "h": 30,
           "isRelative": true,
+          "triggerCount": 0,
+          "resetOnDeath": true,
           "triggerMove": false,
+          "triggerMorph": false,
           "triggerVisibility": false,
           "triggerSlow": false,
-          "triggerFast": true,
-          "triggerBounce": false
+          "triggerFast": false,
+          "triggerBounce": true
         }
-      ]
+      ],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 90,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 830,
       "y": 360,
       "w": 140,
       "h": 18,
-      "hitboxes": []
+      "ow": 140,
+      "oh": 18,
+      "ox": 830,
+      "oy": 360,
+      "hitboxes": [
+        {
+          "x": -10,
+          "y": -10,
+          "w": 160,
+          "h": 38,
+          "isRelative": true,
+          "triggerCount": 0,
+          "resetOnDeath": true,
+          "triggerMove": false,
+          "triggerMorph": false,
+          "triggerVisibility": false,
+          "triggerSlow": false,
+          "triggerFast": true,
+          "triggerBounce": false
+        }
+      ],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 140,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 1080,
       "y": 290,
       "w": 110,
       "h": 18,
-      "hitboxes": []
+      "ow": 110,
+      "oh": 18,
+      "ox": 1080,
+      "oy": 290,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 110,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 1300,
-      "y": 410,
-      "w": 80,
-      "h": 18,
-      "hitboxes": []
+      "y": 400,
+      "w": 100,
+      "h": 20,
+      "ow": 100,
+      "oh": 20,
+      "ox": 1300,
+      "oy": 400,
+      "hitboxes": [
+        {
+          "x": 1290,
+          "y": 390,
+          "w": 110,
+          "h": 30,
+          "isRelative": false,
+          "triggerCount": 0,
+          "resetOnDeath": true,
+          "triggerMove": false,
+          "triggerMorph": true,
+          "triggerVisibility": false,
+          "triggerSlow": false,
+          "triggerFast": false,
+          "triggerBounce": false
+        }
+      ],
+      "morph": "stretch",
+      "morphLoop": false,
+      "targetW": 20,
+      "targetH": 20,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
-      "x": 1500,
+      "x": 1510,
       "y": 380,
       "w": 130,
       "h": 18,
-      "hitboxes": []
+      "ow": 130,
+      "oh": 18,
+      "ox": 1510,
+      "oy": 380,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 130,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 1750,
       "y": 300,
       "w": 120,
       "h": 18,
-      "hitboxes": []
+      "ow": 120,
+      "oh": 18,
+      "ox": 1750,
+      "oy": 300,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 120,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 1980,
       "y": 390,
       "w": 90,
       "h": 18,
-      "hitboxes": [
-        {
-          "x": -10,
-          "y": -10,
-          "w": 110,
-          "h": 38,
-          "isRelative": true,
-          "triggerMove": false,
-          "triggerVisibility": false,
-          "triggerSlow": false,
-          "triggerFast": false,
-          "triggerBounce": true
-        }
-      ]
+      "ow": 90,
+      "oh": 18,
+      "ox": 1980,
+      "oy": 390,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 90,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
-      "x": 2210,
+      "x": 2200,
       "y": 380,
-      "w": 180,
-      "h": 20,
-      "hitboxes": [
-        {
-          "x": 0,
-          "y": -10,
-          "w": 180,
-          "h": 30,
-          "isRelative": true,
-          "triggerMove": false,
-          "triggerVisibility": false,
-          "triggerSlow": false,
-          "triggerFast": true,
-          "triggerBounce": false
-        }
-      ]
+      "w": 130,
+      "h": 18,
+      "ow": 130,
+      "oh": 18,
+      "ox": 2200,
+      "oy": 380,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 130,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 2450,
       "y": 310,
-      "w": 150,
-      "h": 20,
-      "hitboxes": []
+      "w": 110,
+      "h": 18,
+      "ow": 110,
+      "oh": 18,
+      "ox": 2450,
+      "oy": 310,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 110,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 2950,
       "y": 360,
       "w": 140,
       "h": 18,
-      "hitboxes": []
+      "ow": 140,
+      "oh": 18,
+      "ox": 2950,
+      "oy": 360,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 140,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
-      "x": 3300,
+      "x": 3250,
       "y": 290,
       "w": 110,
       "h": 18,
-      "hitboxes": []
+      "ow": 110,
+      "oh": 18,
+      "ox": 3250,
+      "oy": 290,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 110,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
+    },
+    {
+      "x": 3550,
+      "y": 390,
+      "w": 100,
+      "h": 18,
+      "ow": 100,
+      "oh": 18,
+      "ox": 3550,
+      "oy": 390,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 100,
+      "targetH": 18,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 2500,
-      "y": 430,
-      "w": 100,
-      "h": 50,
-      "hitboxes": [
-        {
-          "x": 0,
-          "y": -10,
-          "w": 100,
-          "h": 60,
-          "isRelative": true,
-          "triggerMove": false,
-          "triggerVisibility": false,
-          "triggerSlow": false,
-          "triggerFast": false,
-          "triggerBounce": true
-        }
-      ]
+      "y": 460,
+      "w": 60,
+      "h": 20,
+      "ow": 60,
+      "oh": 20,
+      "ox": 2500,
+      "oy": 460,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 60,
+      "targetH": 20,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
-      "x": 3340,
-      "y": 440,
+      "x": 3350,
+      "y": 460,
       "w": 60,
-      "h": 40,
-      "hitboxes": []
+      "h": 20,
+      "ow": 60,
+      "oh": 20,
+      "ox": 3350,
+      "oy": 460,
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 60,
+      "targetH": 20,
+      "targetOffX": 0,
+      "targetOffY": 0
     }
   ],
   "movers": [
@@ -219,6 +468,8 @@
       "y": 390,
       "w": 90,
       "h": 16,
+      "ow": 90,
+      "oh": 16,
       "ox": 2680,
       "oy": 390,
       "ax": 90,
@@ -231,13 +482,21 @@
       "pathSpeed": 2,
       "pathDist": 0,
       "pathDir": 1,
-      "hitboxes": []
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 90,
+      "targetH": 16,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
       "x": 1200,
       "y": 390,
       "w": 80,
       "h": 16,
+      "ow": 80,
+      "oh": 16,
       "ox": 1200,
       "oy": 390,
       "ax": 0,
@@ -250,14 +509,22 @@
       "pathSpeed": 2,
       "pathDist": 0,
       "pathDir": 1,
-      "hitboxes": []
+      "hitboxes": [],
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 80,
+      "targetH": 16,
+      "targetOffX": 0,
+      "targetOffY": 0
     },
     {
-      "x": 230,
-      "y": 300,
+      "x": 220,
+      "y": 290,
       "w": 20,
-      "h": 180,
-      "ox": 230,
+      "h": 190,
+      "ow": 40,
+      "oh": 180,
+      "ox": 210,
       "oy": 300,
       "ax": 60,
       "ay": 0,
@@ -268,27 +535,23 @@
       "path": [
         {
           "x": 230,
-          "y": 300
+          "y": 380
         },
         {
           "x": 230,
-          "y": 240
+          "y": 350
         },
         {
           "x": 230,
-          "y": 190
+          "y": 305
         },
         {
           "x": 230,
-          "y": 220
+          "y": 430
         },
         {
           "x": 230,
-          "y": 330
-        },
-        {
-          "x": 230,
-          "y": 450
+          "y": 500
         }
       ],
       "pathSpeed": 2,
@@ -297,102 +560,34 @@
       "hitboxes": [
         {
           "x": 180,
-          "y": 430,
-          "w": 50,
-          "h": 50,
+          "y": 450,
+          "w": 40,
+          "h": 30,
           "isRelative": false,
+          "triggerCount": 0,
+          "resetOnDeath": true,
           "triggerMove": true,
+          "triggerMorph": false,
           "triggerVisibility": false,
           "triggerSlow": false,
           "triggerFast": false,
           "triggerBounce": false
         }
-      ]
-    },
-    {
-      "x": 2900,
-      "y": 480,
-      "w": 360,
-      "h": 60,
-      "ox": 2900,
-      "oy": 480,
-      "ax": 60,
-      "ay": 0,
-      "spd": 0.02,
-      "phase": 0,
-      "dx": 0,
-      "dy": 0,
-      "path": [
-        {
-          "x": 2900,
-          "y": 480
-        },
-        {
-          "x": 2900,
-          "y": 480
-        },
-        {
-          "x": 2900,
-          "y": 480
-        }
       ],
-      "pathSpeed": 2,
-      "pathDist": 0,
-      "pathDir": 1,
-      "hitboxes": []
-    },
-    {
-      "x": 3260,
-      "y": 480,
-      "w": 300,
-      "h": 60,
-      "ox": 3260,
-      "oy": 480,
-      "ax": 60,
-      "ay": 0,
-      "spd": 0.02,
-      "phase": 0,
-      "dx": 0,
-      "dy": 0,
-      "path": [
-        {
-          "x": 3260,
-          "y": 480
-        },
-        {
-          "x": 3360,
-          "y": 480
-        },
-        {
-          "x": 3450,
-          "y": 480
-        }
-      ],
-      "pathSpeed": 2,
-      "pathDist": 0,
-      "pathDir": 1,
-      "hitboxes": [
-        {
-          "x": -10,
-          "y": -10,
-          "w": 320,
-          "h": 80,
-          "isRelative": true,
-          "triggerMove": true,
-          "triggerVisibility": false,
-          "triggerSlow": false,
-          "triggerFast": false,
-          "triggerBounce": true
-        }
-      ]
+      "morph": "none",
+      "morphLoop": true,
+      "targetW": 40,
+      "targetH": 180,
+      "targetOffX": 0,
+      "targetOffY": 0
     }
   ],
   "spikes": [
     {
-      "x": 360,
-      "y": 460,
-      "w": 80,
-      "h": 20
+      "x": 300,
+      "y": 456,
+      "w": 70,
+      "h": 24
     },
     {
       "x": 900,
@@ -419,37 +614,55 @@
       "h": 24
     },
     {
-      "x": 3400,
-      "y": 460,
-      "w": 120,
-      "h": 20
+      "x": 3450,
+      "y": 456,
+      "w": 70,
+      "h": 24
     },
     {
       "x": 470,
       "y": 284,
       "w": 40,
       "h": 16
+    },
+    {
+      "x": 2500,
+      "y": 454,
+      "w": 60,
+      "h": 6
     }
   ],
   "adv_spikes": [
     {
-      "x": 2960,
-      "y": 320,
-      "w": 120,
-      "h": 40,
+      "x": 880,
+      "y": 330,
+      "w": 90,
+      "h": 30,
+      "ow": 90,
+      "oh": 30,
+      "ox": 880,
+      "oy": 330,
       "damage": 3,
       "shape": "triangle",
       "visibility": "near",
       "morph": "none",
+      "morphLoop": true,
       "layer": "top",
+      "targetW": 90,
+      "targetH": 30,
+      "targetOffX": 0,
+      "targetOffY": 0,
       "hitboxes": [
         {
-          "x": -20,
+          "x": -50,
           "y": -10,
-          "w": 140,
-          "h": 60,
+          "w": 150,
+          "h": 40,
           "isRelative": true,
+          "triggerCount": 0,
+          "resetOnDeath": true,
           "triggerMove": false,
+          "triggerMorph": false,
           "triggerVisibility": true,
           "triggerSlow": false,
           "triggerFast": false,
@@ -457,31 +670,41 @@
         }
       ],
       "phase": 0,
-      "ox": 2960,
-      "oy": 320,
       "path": [],
       "pathSpeed": 2,
       "pathDist": 0,
       "pathDir": 1
     },
     {
-      "x": 2500,
-      "y": 330,
-      "w": 100,
-      "h": 10,
+      "x": 1080,
+      "y": 310,
+      "w": 40,
+      "h": 20,
+      "ow": 60,
+      "oh": 30,
+      "ox": 1080,
+      "oy": 310,
       "damage": 3,
       "shape": "triangle",
       "visibility": "always",
       "morph": "none",
+      "morphLoop": true,
       "layer": "top",
+      "targetW": 60,
+      "targetH": 30,
+      "targetOffX": 0,
+      "targetOffY": 0,
       "hitboxes": [
         {
-          "x": -10,
-          "y": -10,
-          "w": 110,
-          "h": 30,
-          "isRelative": true,
-          "triggerMove": false,
+          "x": 1080,
+          "y": 340,
+          "w": 40,
+          "h": 140,
+          "isRelative": false,
+          "triggerCount": 1,
+          "resetOnDeath": true,
+          "triggerMove": true,
+          "triggerMorph": false,
           "triggerVisibility": false,
           "triggerSlow": false,
           "triggerFast": false,
@@ -489,31 +712,54 @@
         }
       ],
       "phase": 0,
-      "ox": 2500,
-      "oy": 330,
-      "path": [],
-      "pathSpeed": 2,
+      "path": [
+        {
+          "x": 1100,
+          "y": 325
+        },
+        {
+          "x": 1100,
+          "y": 420
+        },
+        {
+          "x": 1100,
+          "y": 530
+        }
+      ],
+      "pathSpeed": 7,
       "pathDist": 0,
       "pathDir": 1
     },
     {
-      "x": 2500,
-      "y": 290,
-      "w": 100,
-      "h": 20,
+      "x": 1510,
+      "y": 350,
+      "w": 60,
+      "h": 30,
+      "ow": 80,
+      "oh": 40,
+      "ox": 1510,
+      "oy": 340,
       "damage": 3,
       "shape": "triangle",
       "visibility": "near",
       "morph": "none",
+      "morphLoop": true,
       "layer": "top",
+      "targetW": 80,
+      "targetH": 40,
+      "targetOffX": 0,
+      "targetOffY": 0,
       "hitboxes": [
         {
-          "x": -10,
-          "y": -10,
-          "w": 120,
-          "h": 40,
-          "isRelative": true,
+          "x": 1490,
+          "y": 330,
+          "w": 90,
+          "h": 50,
+          "isRelative": false,
+          "triggerCount": 0,
+          "resetOnDeath": true,
           "triggerMove": false,
+          "triggerMorph": false,
           "triggerVisibility": true,
           "triggerSlow": false,
           "triggerFast": false,
@@ -521,29 +767,63 @@
         }
       ],
       "phase": 0,
-      "ox": 2500,
-      "oy": 290,
       "path": [],
       "pathSpeed": 2,
       "pathDist": 0,
       "pathDir": 1
     },
     {
-      "x": 3320,
-      "y": 310,
-      "w": 90,
+      "x": 1760,
+      "y": 320,
+      "w": 70,
       "h": 20,
-      "damage": 1,
+      "ow": 100,
+      "oh": 20,
+      "ox": 1760,
+      "oy": 320,
+      "damage": 3,
       "shape": "triangle",
       "visibility": "always",
       "morph": "none",
+      "morphLoop": true,
       "layer": "top",
-      "hitboxes": [],
+      "targetW": 100,
+      "targetH": 20,
+      "targetOffX": 0,
+      "targetOffY": 0,
+      "hitboxes": [
+        {
+          "x": 1750,
+          "y": 260,
+          "w": 90,
+          "h": 50,
+          "isRelative": false,
+          "triggerCount": 1,
+          "resetOnDeath": true,
+          "triggerMove": true,
+          "triggerMorph": false,
+          "triggerVisibility": false,
+          "triggerSlow": false,
+          "triggerFast": false,
+          "triggerBounce": false
+        }
+      ],
       "phase": 0,
-      "ox": 3320,
-      "oy": 310,
-      "path": [],
-      "pathSpeed": 2,
+      "path": [
+        {
+          "x": 1795,
+          "y": 330
+        },
+        {
+          "x": 1790,
+          "y": 270
+        },
+        {
+          "x": 1780,
+          "y": 230
+        }
+      ],
+      "pathSpeed": 7,
       "pathDist": 0,
       "pathDir": 1
     }
@@ -561,6 +841,10 @@
       "pathDist": 0,
       "pathDir": 1,
       "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
       "minX": 860,
       "maxX": 1150,
       "vx": 1.5
@@ -577,6 +861,10 @@
       "pathDist": 0,
       "pathDir": 1,
       "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
       "minX": 1450,
       "maxX": 1950,
       "vx": 1.8
@@ -593,6 +881,10 @@
       "pathDist": 0,
       "pathDir": 1,
       "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
       "minX": 2200,
       "maxX": 2650,
       "vx": 1.6
@@ -609,6 +901,10 @@
       "pathDist": 0,
       "pathDir": 1,
       "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
       "minX": 2960,
       "maxX": 3550,
       "vx": 1.9
@@ -625,6 +921,10 @@
       "pathDist": 0,
       "pathDir": 1,
       "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
       "baseY": 210,
       "phase": 0,
       "cd": 60
@@ -641,6 +941,10 @@
       "pathDist": 0,
       "pathDir": 1,
       "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
       "baseY": 180,
       "phase": 1.5,
       "cd": 90
@@ -657,13 +961,37 @@
       "pathDist": 0,
       "pathDir": 1,
       "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
       "baseY": 200,
       "phase": 3,
       "cd": 120
     },
     {
       "type": "shooter",
-      "x": 1860,
+      "x": 1120,
+      "y": 260,
+      "w": 26,
+      "h": 26,
+      "alive": true,
+      "path": [],
+      "pathSpeed": 2,
+      "pathDist": 0,
+      "pathDir": 1,
+      "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
+      "baseY": 260,
+      "phase": 0,
+      "cd": 90
+    },
+    {
+      "type": "shooter",
+      "x": 2510,
       "y": 270,
       "w": 26,
       "h": 26,
@@ -673,7 +1001,71 @@
       "pathDist": 0,
       "pathDir": 1,
       "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
       "baseY": 270,
+      "phase": 0,
+      "cd": 90
+    },
+    {
+      "type": "shooter",
+      "x": 2470,
+      "y": 280,
+      "w": 26,
+      "h": 26,
+      "alive": true,
+      "path": [],
+      "pathSpeed": 2,
+      "pathDist": 0,
+      "pathDir": 1,
+      "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
+      "baseY": 280,
+      "phase": 0,
+      "cd": 90
+    },
+    {
+      "type": "shooter",
+      "x": 3010,
+      "y": 340,
+      "w": 26,
+      "h": 26,
+      "alive": true,
+      "path": [],
+      "pathSpeed": 2,
+      "pathDist": 0,
+      "pathDir": 1,
+      "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
+      "baseY": 340,
+      "phase": 0,
+      "cd": 90
+    },
+    {
+      "type": "shooter",
+      "x": 2830,
+      "y": 230,
+      "w": 26,
+      "h": 26,
+      "alive": true,
+      "path": [],
+      "pathSpeed": 2,
+      "pathDist": 0,
+      "pathDir": 1,
+      "hitboxes": [],
+      "hp": 1,
+      "maxHp": 1,
+      "damage": 1,
+      "resetOnDeath": true,
+      "baseY": 230,
       "phase": 0,
       "cd": 90
     }
@@ -731,7 +1123,7 @@
     }
   ],
   "goal": {
-    "x": 3950,
+    "x": 3900,
     "y": 400,
     "w": 34,
     "h": 80
