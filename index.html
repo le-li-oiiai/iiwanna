@@ -151,6 +151,32 @@
   #exit-btn.visible{display:block;}
   #exit-btn:hover{background:#252540;color:#fff;border-color:#3d3d66;}
 
+  /* ========== 通关浮层 ========== */
+  #win-overlay{
+    position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    background:rgba(5,5,15,.85);backdrop-filter:blur(6px);
+    opacity:0;pointer-events:none;transition:opacity .4s;
+  }
+  #win-overlay.visible{
+    opacity:1;pointer-events:auto;
+  }
+  .win-title{
+    font-size:56px;color:#fde047;text-shadow:0 0 30px #fde047;
+    margin-bottom:10px;animation: bounceWin 1.5s infinite alternate;
+  }
+  @keyframes bounceWin {
+    from { transform: translateY(0); }
+    to { transform: translateY(-12px); }
+  }
+  .win-sub{
+    font-size:18px;color:#e2e8f0;margin-bottom:40px;
+  }
+  .win-actions{
+    display:flex;gap:16px;
+  }
+  .win-actions .btn{ padding: 10px 24px; font-size: 14px; }
+
   ::-webkit-scrollbar{width:8px;height:8px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:#252540;border-radius:4px;}
@@ -200,7 +226,19 @@
 </div>
 
 <!-- ============ 游戏 ============ -->
-<div id="wrap"><canvas id="game"></canvas></div>
+<div id="wrap">
+  <canvas id="game"></canvas>
+  
+  <!-- 通关浮层 -->
+  <div id="win-overlay">
+    <h2 class="win-title">🏆 YOU WIN!</h2>
+    <div class="win-sub">死亡次数: <span id="win-deaths">0</span></div>
+    <div class="win-actions">
+      <button id="btn-back-menu" class="btn ghost">返回选关</button>
+      <button id="btn-next-level" class="btn">下一关 ▶</button>
+    </div>
+  </div>
+</div>
 <button id="exit-btn">✕ 退出关卡</button>
 
 <script>
@@ -217,7 +255,14 @@ var statusEl = $('levels-status');
 var pasteBox = $('paste-box');
 var nameInput= $('level-name');
 
+var winOverlay = $('win-overlay');
+var winDeathsEl = $('win-deaths');
+var btnNextLevel = $('btn-next-level');
+var btnBackMenu = $('btn-back-menu');
+
 var currentGame = null;
+var allLevels = [];           // 保存当前所有可用关卡的顺序
+var currentLevelIndex = -1;   // 玩家当前正在玩的关卡在列表中的索引
 
 /* ============================================================
    localStorage 关卡（本机保存）
@@ -248,7 +293,6 @@ function removeLocalLevel(id){
    读取在线关卡列表
    ============================================================ */
 function fetchOnlineLevels(){
-  // 强制加时间戳避免浏览器缓存
   return fetch('levels.json?_=' + Date.now())
     .then(function(r){
       if(!r.ok) throw new Error('找不到 levels.json 文件 (HTTP ' + r.status + ')');
@@ -283,9 +327,10 @@ function refreshLevelList(){
 
   fetchOnlineLevels()
     .then(function(remoteList){
-      var all = local.concat(remoteList);
+      // 更新全局关卡列表
+      allLevels = local.concat(remoteList);
 
-      if(all.length === 0){
+      if(allLevels.length === 0){
         gridEl.innerHTML =
           '<div class="empty-tip">还没有可用的关卡<br>' +
           '<span>请检查 levels.json 是否有内容，或粘贴到下方保存</span></div>';
@@ -294,16 +339,17 @@ function refreshLevelList(){
       }
 
       statusEl.textContent =
-        '共 ' + all.length + ' 个关卡（本地 ' + local.length + ' · 在线 ' + remoteList.length + '）';
+        '共 ' + allLevels.length + ' 个关卡（本地 ' + local.length + ' · 在线 ' + remoteList.length + '）';
 
-      all.forEach(function(item){
-        gridEl.appendChild(buildLevelCard(item));
+      allLevels.forEach(function(item, index){
+        gridEl.appendChild(buildLevelCard(item, index));
       });
     })
     .catch(function(err){
-      // 如果在线获取失败（比如还在本地测试），依然显示本地关卡
-      if(local.length > 0){
-        local.forEach(function(item){ gridEl.appendChild(buildLevelCard(item)); });
+      // 如果在线获取失败，依然显示本地关卡
+      allLevels = local.slice(); // 深拷贝
+      if(allLevels.length > 0){
+        allLevels.forEach(function(item, index){ gridEl.appendChild(buildLevelCard(item, index)); });
         statusEl.textContent = '在线列表获取失败：' + err.message + '（仅显示本地关卡）';
       } else {
         gridEl.innerHTML =
@@ -315,7 +361,7 @@ function refreshLevelList(){
     });
 }
 
-function buildLevelCard(item){
+function buildLevelCard(item, index){
   var card = document.createElement('div');
   card.className = 'level-card';
 
@@ -348,14 +394,16 @@ function buildLevelCard(item){
     card.appendChild(actions);
   }
 
-  card.addEventListener('click', function(){ enterLevel(item); });
+  card.addEventListener('click', function(){ enterLevel(item, index); });
   return card;
 }
 
 /* ============================================================
    进入 / 退出关卡
    ============================================================ */
-function enterLevel(item){
+function enterLevel(item, index){
+  currentLevelIndex = (index !== undefined) ? index : allLevels.indexOf(item);
+
   if(item.type === 'local'){
     var txt = getLocalData(item.id);
     if(!txt){ alert('本地关卡数据丢失'); refreshLevelList(); return; }
@@ -366,7 +414,6 @@ function enterLevel(item){
   statusEl.textContent = '正在加载「' + item.name + '」...';
   statusEl.classList.remove('error');
   
-  // 避免浏览器缓存关卡文件
   fetch(item.url + '?_=' + Date.now())
     .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
     .then(function(txt){ loadAndStart(txt, item.name); })
@@ -387,6 +434,9 @@ function loadAndStart(raw, displayName){
 
   if(currentGame){ try{ currentGame.stop(); }catch(e){} currentGame = null; }
 
+  // 隐藏通关浮层
+  winOverlay.classList.remove('visible');
+
   // 用全新的 canvas，彻底避免旧事件残留
   var oldCvs = document.getElementById('game');
   var newCvs = document.createElement('canvas');
@@ -398,7 +448,10 @@ function loadAndStart(raw, displayName){
   exitBtn.classList.add('visible');
 
   try{
-    currentGame = startGameEngine(newCvs, level);
+    // 传入一个通关回调
+    currentGame = startGameEngine(newCvs, level, function(deaths){
+      showWinScreen(deaths);
+    });
   }catch(e){
     wrapEl.classList.remove('visible');
     exitBtn.classList.remove('visible');
@@ -407,16 +460,44 @@ function loadAndStart(raw, displayName){
   }
 }
 
+function showWinScreen(deaths){
+  winDeathsEl.textContent = deaths;
+  winOverlay.classList.add('visible');
+
+  // 判断是否有下一关
+  if(currentLevelIndex >= 0 && currentLevelIndex < allLevels.length - 1){
+    btnNextLevel.disabled = false;
+    btnNextLevel.textContent = '下一关 ▶';
+    btnNextLevel.style.opacity = '1';
+    btnNextLevel.style.cursor = 'pointer';
+  } else {
+    btnNextLevel.disabled = true;
+    btnNextLevel.textContent = '已是最后一关';
+    btnNextLevel.style.opacity = '0.5';
+    btnNextLevel.style.cursor = 'default';
+  }
+}
+
 function exitLevel(){
   if(!confirm('退出并回到选关界面？')) return;
   if(currentGame){ try{ currentGame.stop(); }catch(e){} currentGame = null; }
+  
+  winOverlay.classList.remove('visible');
   wrapEl.classList.remove('visible');
   exitBtn.classList.remove('visible');
   menuEl.classList.remove('hidden');
+  
   var cvs = document.getElementById('game');
   if(cvs){ var ctx = cvs.getContext('2d'); ctx.clearRect(0,0,cvs.width,cvs.height); }
 }
 exitBtn.addEventListener('click', exitLevel);
+btnBackMenu.addEventListener('click', exitLevel);
+
+btnNextLevel.addEventListener('click', function(){
+  if(currentLevelIndex >= 0 && currentLevelIndex < allLevels.length - 1){
+    enterLevel(allLevels[currentLevelIndex + 1], currentLevelIndex + 1);
+  }
+});
 
 /* ============================================================
    JSON 保存 / 下载
@@ -563,7 +644,7 @@ function normalizeLevel(d){
 /* ============================================================
    游戏引擎
    ============================================================ */
-function startGameEngine(cvs, L){
+function startGameEngine(cvs, L, onWinCallback){
 
 var ctx = cvs.getContext('2d');
 var W = 960, H = 540;
@@ -571,6 +652,7 @@ cvs.width = W; cvs.height = H;
 ctx.imageSmoothingEnabled = false;
 
 var running = true;
+var winTriggered = false;
 var rafId = null;
 var listeners = [];
 function on(target, event, fn, opts){
@@ -971,7 +1053,14 @@ function respawn(){
 function update(){
   state.t++; updateMovers(); updateAdvSpikes();
   if(state.mode === 'play') updatePlayer();
-  else if(state.mode === 'dead'){ state.deadTimer--; if(state.deadTimer <= 0) respawn(); } else if(state.mode === 'win') state.winTimer++;
+  else if(state.mode === 'dead'){ state.deadTimer--; if(state.deadTimer <= 0) respawn(); }
+  else if(state.mode === 'win') {
+      state.winTimer++;
+      if(!winTriggered) {
+          winTriggered = true;
+          if(typeof onWinCallback === 'function') onWinCallback(state.deaths);
+      }
+  }
   updateBullets(); updateEnemies(); updateParticles();
   if(state.mode !== 'win'){
     var targetX = clamp(player.x + player.w/2 - W/2 + player.vx * 6, 0, Math.max(0, WORLD_W - W));
@@ -1120,15 +1209,7 @@ function drawHUD(){
   var mx = mouse.x, my = mouse.y; ctx.strokeStyle = 'rgba(253,224,71,0.85)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(mx, my, 9, 0, Math.PI*2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(mx - 15, my); ctx.lineTo(mx - 5, my); ctx.moveTo(mx + 5, my); ctx.lineTo(mx + 15, my); ctx.moveTo(mx, my - 15); ctx.lineTo(mx, my - 5); ctx.moveTo(mx, my + 5); ctx.lineTo(mx, my + 15); ctx.stroke();
 }
-function drawOverlay(){
-  if(state.mode === 'dead'){ var a = (state.deadTimer / 28) * 0.35; ctx.fillStyle = 'rgba(233,69,96,' + a + ')'; ctx.fillRect(0,0,W,H); }
-  if(state.mode === 'win'){
-    var al = clamp(state.winTimer / 40, 0, 1); ctx.fillStyle = 'rgba(5,5,15,' + (0.72 * al) + ')'; ctx.fillRect(0,0,W,H); ctx.globalAlpha = al; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    var bounce = Math.sin(state.t * 0.08) * 6; ctx.font = 'bold 64px "Courier New",monospace'; ctx.fillStyle = '#fde047'; ctx.shadowColor = '#fde047'; ctx.shadowBlur = 30; ctx.fillText('YOU WIN!', W/2, H/2 - 60 + bounce);
-    ctx.shadowBlur = 0; ctx.font = 'bold 22px "Courier New",monospace'; ctx.fillStyle = '#e2e8f0'; ctx.fillText('死亡次数: ' + state.deaths, W/2, H/2 + 20);
-    ctx.font = '16px "Courier New",monospace'; ctx.fillStyle = 'rgba(180,200,240,0.75)'; ctx.fillText('点击「退出关卡」换个关卡', W/2, H/2 + 62); ctx.globalAlpha = 1;
-  }
-}
+
 function render(){
   ctx.clearRect(0,0,W,H); drawBackground(); var sx = state.shake > 0.2 ? rnd(-state.shake, state.shake) : 0; var sy = state.shake > 0.2 ? rnd(-state.shake, state.shake) : 0;
   ctx.save(); ctx.translate(-Math.round(state.camX) + sx, sy);
@@ -1136,7 +1217,13 @@ function render(){
   drawAdvSpikes('bottom');
   drawEnemies(); drawBullets(); drawPlayer(); drawAdvSpikes('top'); drawParticles();
   ctx.restore();
-  drawHUD(); drawOverlay();
+  drawHUD();
+  
+  if(state.mode === 'dead'){ 
+    var a = (state.deadTimer / 28) * 0.35; 
+    ctx.fillStyle = 'rgba(233,69,96,' + a + ')'; 
+    ctx.fillRect(0,0,W,H); 
+  }
 }
 
 var lastTime = performance.now(); var accumulator = 0; var STEP = 1000 / 60;
@@ -1172,7 +1259,6 @@ return {
 (function init(){
   refreshLevelList();
 
-  // 支持 ?level=xxx.json 直接进入关卡
   var levelUrl = null;
   try{ levelUrl = new URLSearchParams(location.search).get('level'); }catch(e){}
 
@@ -1182,6 +1268,8 @@ return {
       .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
       .then(function(txt){
         var nm = levelUrl.split('/').pop().replace(/\.json$/i, '');
+        // 传入 -1 代表没有上下文（直接打开的单个关卡），无法下一关
+        currentLevelIndex = -1; 
         loadAndStart(txt, nm);
       })
       .catch(function(e){
