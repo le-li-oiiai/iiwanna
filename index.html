@@ -9,7 +9,6 @@
   html,body{height:100%;width:100%;background:#05050c;color:#c8d0e8;
     font-family:'Courier New',Consolas,monospace;font-size:13px;overflow:hidden;}
 
-  /* ========== 选关界面 ========== */
   #menu{
     position:fixed;inset:0;overflow-y:auto;
     background:radial-gradient(circle at 50% 0%,#151535,#05050c 60%);
@@ -132,7 +131,6 @@
     padding:1px 5px;border-radius:3px;font-size:10px;
   }
 
-  /* ========== 游戏界面 ========== */
   #wrap{
     position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
     width:min(100vw,177.78vh);aspect-ratio:960/540;
@@ -151,7 +149,6 @@
   #exit-btn.visible{display:block;}
   #exit-btn:hover{background:#252540;color:#fff;border-color:#3d3d66;}
 
-  /* ========== 通关浮层 ========== */
   #win-overlay{
     position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;
     align-items:center;justify-content:center;
@@ -185,7 +182,6 @@
 </head>
 <body>
 
-<!-- ============ 选关界面 ============ -->
 <div id="menu">
   <div class="menu-inner">
     <header class="menu-head">
@@ -225,11 +221,8 @@
   </div>
 </div>
 
-<!-- ============ 游戏 ============ -->
 <div id="wrap">
   <canvas id="game"></canvas>
-  
-  <!-- 通关浮层 -->
   <div id="win-overlay">
     <h2 class="win-title">🏆 YOU WIN!</h2>
     <div class="win-sub">死亡次数: <span id="win-deaths">0</span></div>
@@ -261,12 +254,9 @@ var btnNextLevel = $('btn-next-level');
 var btnBackMenu = $('btn-back-menu');
 
 var currentGame = null;
-var allLevels = [];           // 保存当前所有可用关卡的顺序
-var currentLevelIndex = -1;   // 玩家当前正在玩的关卡在列表中的索引
+var allLevels = [];
+var currentLevelIndex = -1;
 
-/* ============================================================
-   localStorage 关卡（本机保存）
-   ============================================================ */
 var LS_INDEX = 'iwsl_index';
 var LS_DATA_PREFIX = 'iwsl_data_';
 
@@ -289,9 +279,6 @@ function removeLocalLevel(id){
   try{ localStorage.removeItem(LS_DATA_PREFIX + id); }catch(e){}
 }
 
-/* ============================================================
-   读取在线关卡列表
-   ============================================================ */
 function fetchOnlineLevels(){
   return fetch('levels.json?_=' + Date.now())
     .then(function(r){
@@ -313,9 +300,6 @@ function fetchOnlineLevels(){
     });
 }
 
-/* ============================================================
-   选关列表渲染
-   ============================================================ */
 function refreshLevelList(){
   statusEl.textContent = '正在读取关卡列表...';
   statusEl.classList.remove('error');
@@ -327,7 +311,6 @@ function refreshLevelList(){
 
   fetchOnlineLevels()
     .then(function(remoteList){
-      // 更新全局关卡列表
       allLevels = local.concat(remoteList);
 
       if(allLevels.length === 0){
@@ -346,8 +329,7 @@ function refreshLevelList(){
       });
     })
     .catch(function(err){
-      // 如果在线获取失败，依然显示本地关卡
-      allLevels = local.slice(); // 深拷贝
+      allLevels = local.slice();
       if(allLevels.length > 0){
         allLevels.forEach(function(item, index){ gridEl.appendChild(buildLevelCard(item, index)); });
         statusEl.textContent = '在线列表获取失败：' + err.message + '（仅显示本地关卡）';
@@ -398,9 +380,6 @@ function buildLevelCard(item, index){
   return card;
 }
 
-/* ============================================================
-   进入 / 退出关卡
-   ============================================================ */
 function enterLevel(item, index){
   currentLevelIndex = (index !== undefined) ? index : allLevels.indexOf(item);
 
@@ -434,10 +413,8 @@ function loadAndStart(raw, displayName){
 
   if(currentGame){ try{ currentGame.stop(); }catch(e){} currentGame = null; }
 
-  // 隐藏通关浮层
   winOverlay.classList.remove('visible');
 
-  // 用全新的 canvas，彻底避免旧事件残留
   var oldCvs = document.getElementById('game');
   var newCvs = document.createElement('canvas');
   newCvs.id = 'game';
@@ -448,7 +425,6 @@ function loadAndStart(raw, displayName){
   exitBtn.classList.add('visible');
 
   try{
-    // 传入一个通关回调
     currentGame = startGameEngine(newCvs, level, function(deaths){
       showWinScreen(deaths);
     });
@@ -464,7 +440,6 @@ function showWinScreen(deaths){
   winDeathsEl.textContent = deaths;
   winOverlay.classList.add('visible');
 
-  // 判断是否有下一关
   if(currentLevelIndex >= 0 && currentLevelIndex < allLevels.length - 1){
     btnNextLevel.disabled = false;
     btnNextLevel.textContent = '下一关 ▶';
@@ -478,9 +453,7 @@ function showWinScreen(deaths){
   }
 }
 
-// 改造 exitLevel 函数，增加 skipConfirm 参数
 function exitLevel(skipConfirm){
-  // 如果 skipConfirm 为 true，或者已经通关，就不弹窗
   var isWin = winOverlay.classList.contains('visible');
   if(!skipConfirm && !isWin){
     if(!confirm('退出并回到选关界面？')) return;
@@ -506,9 +479,6 @@ btnNextLevel.addEventListener('click', function(){
   }
 });
 
-/* ============================================================
-   JSON 保存 / 下载
-   ============================================================ */
 $('btn-save-local').addEventListener('click', function(){
   var txt = pasteBox.value.trim();
   if(!txt){ alert('请先粘贴关卡 JSON 文本'); return; }
@@ -550,9 +520,6 @@ $('btn-download').addEventListener('click', function(){
 
 $('btn-refresh').addEventListener('click', refreshLevelList);
 
-/* ============================================================
-   关卡规范化
-   ============================================================ */
 function normalizeLevel(d){
   if(!d || typeof d !== 'object') throw new Error('关卡数据格式错误');
 
@@ -650,11 +617,7 @@ function normalizeLevel(d){
   return L;
 }
 
-/* ============================================================
-   游戏引擎
-   ============================================================ */
 function startGameEngine(cvs, L, onWinCallback){
-
 var ctx = cvs.getContext('2d');
 var W = 960, H = 540;
 cvs.width = W; cvs.height = H;
@@ -685,7 +648,6 @@ var enemies      = L.enemies;
 var checkpoints  = L.checkpoints;
 var goal         = L.goal;
 
-// 初始化形变属性
 staticSolids.forEach(function(e){
     e.ow = e.w; e.oh = e.h; e.ox = e.x; e.oy = e.y;
     if(e.hitboxes) e.hitboxes.forEach(function(h){ h._hits = 0; h._curCollide = false; });
@@ -703,6 +665,51 @@ enemies.forEach(function(e){
 });
 
 var solids = staticSolids.concat(movers);
+
+function getHitboxRect(ent, h, t) {
+    var morph = ent.morph || 'none';
+    var ow = ent.ow !== undefined ? ent.ow : ent.w;
+    var oh = ent.oh !== undefined ? ent.oh : ent.h;
+    var ox = ent.ox !== undefined ? ent.ox : ent.x;
+    var oy = ent.oy !== undefined ? ent.oy : ent.y;
+    
+    var cw = ow, ch = oh;
+    if (morph === 'pulse') {
+        var scale = 1 + Math.sin(t * 0.1) * 0.2;
+        cw = ow * scale; ch = oh * scale;
+    } else if (morph === 'stretch') {
+        var p = (Math.sin(t * 0.05) + 1) / 2;
+        cw = ow + ((ent.targetW || ow) - ow) * p;
+        ch = oh + ((ent.targetH || oh) - oh) * p;
+    }
+    
+    var sx = cw / ow;
+    var sy = ch / oh;
+    
+    var ecx = ent.x + ent.w / 2;
+    var ecy = ent.y + ent.h / 2;
+    
+    var ocx = ox + ow / 2;
+    var ocy = oy + oh / 2;
+    
+    var ohcx = h.isRelative ? (ox + h.x + h.w / 2) : (h.x + h.w / 2);
+    var ohcy = h.isRelative ? (oy + h.y + h.h / 2) : (h.y + h.h / 2);
+    
+    var offsetX = ohcx - ocx;
+    var offsetY = ohcy - ocy;
+    
+    var new_hcx = ecx + offsetX * sx;
+    var new_hcy = ecy + offsetY * sy;
+    var new_hw = h.w * sx;
+    var new_hh = h.h * sy;
+    
+    return {
+        x: new_hcx - new_hw / 2,
+        y: new_hcy - new_hh / 2,
+        w: new_hw,
+        h: new_hh
+    };
+}
 
 var audioCtx = null;
 function initAudio(){
@@ -850,9 +857,8 @@ function updateMovers(){
         var h = m.hitboxes[j];
         if (h.triggerMove) {
           hasMoveTrigger = true;
-          var hx = h.isRelative ? m.x + h.x : h.x;
-          var hy = h.isRelative ? m.y + h.y : h.y;
-          if (rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})) {
+          var rect = getHitboxRect(m, h, state.t);
+          if (rectHit(player, rect)) {
               if(h._hits > (h.triggerCount || 0)) triggerMove = true;
           }
         }
@@ -979,9 +985,8 @@ function updateAdvSpikes(){
         var h = s.hitboxes[j];
         if (h.triggerMove) {
           hasMoveTrigger = true;
-          var hx = h.isRelative ? s.x + h.x : h.x;
-          var hy = h.isRelative ? s.y + h.y : h.y;
-          if (rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})) {
+          var rect = getHitboxRect(s, h, state.t);
+          if (rectHit(player, rect)) {
               if(h._hits > (h.triggerCount || 0)) triggerMove = true;
           }
         }
@@ -1028,10 +1033,10 @@ function checkHitboxTriggers(){
     if(!ent.hitboxes) continue;
     for(var j=0; j<ent.hitboxes.length; j++){
       var hb = ent.hitboxes[j];
-      var hx = hb.isRelative ? ent.x + hb.x : hb.x;
-      var hy = hb.isRelative ? ent.y + hb.y : hb.y;
+      
+      var rect = getHitboxRect(ent, hb, state.t);
+      var isCol = rectHit(p, rect);
 
-      var isCol = rectHit(p, {x:hx, y:hy, w:hb.w, h:hb.h});
       if (isCol && !hb._curCollide) {
           hb._hits++;
       }
@@ -1085,10 +1090,9 @@ function checkHazards(){
         if(h.triggerVisibility) hasVisTrigger = true;
         if(h.triggerDamage) hasDmgTrigger = true;
 
-        var hx = h.isRelative ? s.x + h.x : h.x;
-        var hy = h.isRelative ? s.y + h.y : h.y;
+        var rect = getHitboxRect(s, h, state.t);
+        var isCol = rectHit(player, rect);
 
-        var isCol = rectHit(player, {x: hx, y: hy, w: h.w, h: h.h});
         if (isCol && !h._curCollide) {
             h._hits++;
         }
@@ -1112,9 +1116,8 @@ function checkHazards(){
         for(var j=0; j<s.hitboxes.length; j++){
           var h = s.hitboxes[j];
           if(h.triggerDamage && h._hits > (h.triggerCount || 0)){
-            var hx = h.isRelative ? s.x + h.x : h.x;
-            var hy = h.isRelative ? s.y + h.y : h.y;
-            if(rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})){ hitSpike = true; break; }
+            var rect = getHitboxRect(s, h, state.t);
+            if(rectHit(player, rect)){ hitSpike = true; break; }
           }
         }
       } else {
@@ -1171,7 +1174,6 @@ function respawn(){
   state.camX = clamp(player.x + player.w/2 - W/2, 0, Math.max(0, WORLD_W - W));
   addParticles(player.x + player.w/2, player.y + player.h/2, 16, '#5eead4', 4, 28);
 
-  // 死亡后重置触发器和相关实体
   var allEnts = staticSolids.concat(movers).concat(adv_spikes).concat(enemies);
   for(var i=0; i<allEnts.length; i++) {
       var ent = allEnts[i];
@@ -1186,7 +1188,6 @@ function respawn(){
               }
           }
       }
-      // 如果该实体的触发状态被重置了，把位置和运动状态也复位
       if (shouldReset) {
           if (ent.path) ent.pathDist = 0;
           ent.phase = 0;
@@ -1194,16 +1195,13 @@ function respawn(){
           if (ent.oy !== undefined) ent.y = ent.oy;
       }
   }
-  // 重置一下所有敌人的存活状态
   for(var i=0; i<enemies.length; i++){
       enemies[i].alive = true;
   }
-  // 重置自设尖刺的显隐状态
   for(var i=0; i<adv_spikes.length; i++){
       adv_spikes[i]._activeVis = false;
       adv_spikes[i]._activeDmg = false;
   }
-  // 重置移动平台的激活状态
   for(var i=0; i<movers.length; i++){
       movers[i]._activeMove = false;
   }
@@ -1374,7 +1372,6 @@ function render(){
   drawEnemies(); drawBullets(); drawPlayer(); drawAdvSpikes('top'); drawParticles();
   ctx.restore();
   drawHUD();
-  
   if(state.mode === 'dead'){
     var a = (state.deadTimer / 28) * 0.35;
     ctx.fillStyle = 'rgba(233,69,96,' + a + ')';
@@ -1406,12 +1403,8 @@ return {
     listeners = [];
   }
 };
+}
 
-} /* end startGameEngine */
-
-/* ============================================================
-   初始化
-   ============================================================ */
 (function init(){
   refreshLevelList();
 
@@ -1424,7 +1417,6 @@ return {
       .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
       .then(function(txt){
         var nm = levelUrl.split('/').pop().replace(/\.json$/i, '');
-        // 传入 -1 代表没有上下文（直接打开的单个关卡），无法下一关
         currentLevelIndex = -1; 
         loadAndStart(txt, nm);
       })
