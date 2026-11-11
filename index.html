@@ -649,7 +649,7 @@ function normalizeLevel(d){
 }
 
 /* ============================================================
-   游戏引擎
+   游戏引擎（已与最新版编辑器模板完全同步）
    ============================================================ */
 function startGameEngine(cvs, L, onWinCallback){
 
@@ -792,21 +792,42 @@ function moveEntity(e, list){
     }
   }
 }
+
 function updateMovers(){
   for(var i=0;i<movers.length;i++){
     var m = movers[i];
     var px = m.x, py = m.y;
-    if(m.path && m.path.length >= 2){
-      updatePath(m);
-    } else {
-      m.phase += m.spd;
-      m.x = m.ox + Math.sin(m.phase) * m.ax;
-      m.y = m.oy + Math.sin(m.phase) * m.ay;
+    
+    // 【同步】检查移动平台自身的触发状态
+    var triggerMove = false, hasMoveTrigger = false;
+    if (m.hitboxes) {
+      for(var j=0; j<m.hitboxes.length; j++){
+        var h = m.hitboxes[j];
+        if (h.triggerMove) {
+          hasMoveTrigger = true;
+          var hx = h.isRelative ? m.x + h.x : h.x;
+          var hy = h.isRelative ? m.y + h.y : h.y;
+          if (rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})) triggerMove = true;
+        }
+      }
     }
+    m._activeMove = hasMoveTrigger ? triggerMove : true;
+    
+    if (m._activeMove) {
+      if (m.path && m.path.length >= 2) {
+        updatePath(m);
+      } else {
+        m.phase += m.spd;
+        m.x = m.ox + Math.sin(m.phase) * m.ax;
+        m.y = m.oy + Math.sin(m.phase) * m.ay;
+      }
+    }
+    
     m.dx = m.x - px; m.dy = m.y - py;
     if(player.onGround && player.ground === m && state.mode === 'play'){ player.x += m.dx; player.y += m.dy; }
   }
 }
+
 function updatePlayer(){
   var p = player;
   if(p.slowTimer > 0) p.slowTimer--;
@@ -906,25 +927,29 @@ function updateAdvSpikes(){
   for(var i=0;i<adv_spikes.length;i++){
     var s = adv_spikes[i];
     var triggerMove = false, hasMoveTrigger = false;
-    if(s.hitboxes){
+    
+    // 【同步】检查自设尖刺自身的触发状态
+    if (s.hitboxes) {
       for(var j=0; j<s.hitboxes.length; j++){
         var h = s.hitboxes[j];
-        if(h.triggerMove){
+        if (h.triggerMove) {
           hasMoveTrigger = true;
           var hx = h.isRelative ? s.x + h.x : h.x;
           var hy = h.isRelative ? s.y + h.y : h.y;
-          if(rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})) triggerMove = true;
+          if (rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})) triggerMove = true;
         }
       }
     }
+    
     s._activeMove = hasMoveTrigger ? triggerMove : true;
-    if(s._activeMove){
-      if(s.path && s.path.length >= 2){
+    
+    if (s._activeMove) {
+      if (s.path && s.path.length >= 2) {
         updatePath(s);
       } else {
         s.phase += s.moveSpeed || 0.02;
-        if(s.moveType === 'horizontal') s.x = s.ox + Math.sin(s.phase) * s.moveRange;
-        if(s.moveType === 'vertical')   s.y = s.oy + Math.sin(s.phase) * s.moveRange;
+        if (s.moveType === 'horizontal') s.x = s.ox + Math.sin(s.phase) * s.moveRange;
+        if (s.moveType === 'vertical') s.y = s.oy + Math.sin(s.phase) * s.moveRange;
       }
     }
   }
@@ -945,7 +970,12 @@ function isAdvSpikeVisible(s){
 function checkHitboxTriggers(){
   var p = player;
   var allEnts = staticSolids.concat(movers).concat(adv_spikes).concat(enemies);
-  for(var i=0; i<allEnts.length; i++){ allEnts[i]._trigMove = false; allEnts[i]._trigVis = false; }
+  
+  for(var i=0; i<allEnts.length; i++){
+    allEnts[i]._trigMove = false;
+    allEnts[i]._trigVis = false;
+  }
+  
   for(var i=0; i<allEnts.length; i++){
     var ent = allEnts[i];
     if(!ent.hitboxes) continue;
@@ -953,21 +983,32 @@ function checkHitboxTriggers(){
       var hb = ent.hitboxes[j];
       var hx = hb.isRelative ? ent.x + hb.x : hb.x;
       var hy = hb.isRelative ? ent.y + hb.y : hb.y;
+      
       if(rectHit(p, {x:hx, y:hy, w:hb.w, h:hb.h})){
         if(hb.triggerMove) ent._trigMove = true;
         if(hb.triggerVisibility) ent._trigVis = true;
+        
         if(hb.triggerSlow) p.slowTimer = 20;
         if(hb.triggerFast) p.fastTimer = 20;
-        if(hb.triggerBounce && p.bounceCd <= 0){ p.vx = 0; p.vy = -12; p.bounceCd = 40; beep(600, 0.1, 'sine', 0.05); }
+        if(hb.triggerBounce && p.bounceCd <= 0){
+          p.vx = 0; p.vy = -12; p.bounceCd = 40; beep(600, 0.1, 'sine', 0.05);
+        }
       }
     }
   }
+  
   for(var i=0; i<allEnts.length; i++){
     var ent = allEnts[i];
     if(ent.hitboxes && ent.hitboxes.length > 0){
       var hasVisTrigger = false;
-      for(var j=0; j<ent.hitboxes.length; j++){ if(ent.hitboxes[j].triggerVisibility) hasVisTrigger = true; }
-      if(hasVisTrigger && !ent._trigVis) ent._hidden = true; else ent._hidden = false;
+      for(var j=0; j<ent.hitboxes.length; j++){
+        if(ent.hitboxes[j].triggerVisibility) hasVisTrigger = true;
+      }
+      if(hasVisTrigger && !ent._trigVis){
+        ent._hidden = true;
+      } else {
+        ent._hidden = false;
+      }
     }
   }
 }
@@ -982,11 +1023,13 @@ function checkHazards(){
     var s = adv_spikes[i];
     var triggerVis = false, triggerDmg = false;
     var hasVisTrigger = false, hasDmgTrigger = false;
+    
     if(s.hitboxes){
       for(var j=0; j<s.hitboxes.length; j++){
         var h = s.hitboxes[j];
         if(h.triggerVisibility) hasVisTrigger = true;
         if(h.triggerDamage) hasDmgTrigger = true;
+        
         var hx = h.isRelative ? s.x + h.x : h.x;
         var hy = h.isRelative ? s.y + h.y : h.y;
         if(rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})){
@@ -995,8 +1038,10 @@ function checkHazards(){
         }
       }
     }
+    
     s._activeVis = hasVisTrigger ? triggerVis : true;
     s._activeDmg = hasDmgTrigger ? triggerDmg : true;
+    
     if(s._activeVis && isAdvSpikeVisible(s)){
       var hitSpike = false;
       if(hasDmgTrigger){
@@ -1011,6 +1056,7 @@ function checkHazards(){
       } else {
         if(rectHit(player, {x:s.x+3, y:s.y+3, w:s.w-6, h:s.h-6})) hitSpike = true;
       }
+      
       if(hitSpike){
         if(player.invTimer <= 0){
           player.hp -= s.damage;
@@ -1027,8 +1073,12 @@ function checkHazards(){
     var c = checkpoints[i];
     if(!c.active){
       var hit = false;
-      if(c.type === 'trigger'){ if(player.x + player.w > c.x) hit = true; }
-      else { hit = rectHit(p, c); }
+      if(c.type === 'trigger'){
+        if(player.x + player.w > c.x) hit = true;
+      } else {
+        hit = rectHit(p, c);
+      }
+      
       if(hit){
         c.active = true;
         state.spawn = { x: c.spawnX, y: c.spawnY };
