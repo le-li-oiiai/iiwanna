@@ -3,13 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 <title>I Wanna Shoot · 选关</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;width:100%;background:#05050c;color:#c8d0e8;
     font-family:'Courier New',Consolas,monospace;font-size:13px;overflow:hidden;
-    overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}
+    overscroll-behavior:none;-webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;}
 
+  /* ============ 选关菜单 ============ */
   #menu{
     position:fixed;inset:0;overflow-y:auto;
     -webkit-overflow-scrolling:touch;
@@ -35,9 +40,7 @@
     display:flex;align-items:center;justify-content:space-between;
     margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #1f1f38;
   }
-  .sec-title{
-    color:#6a7290;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;
-  }
+  .sec-title{color:#6a7290;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;}
   .btn-sm{
     background:#161628;border:1px solid #2a2a4a;color:#c8d0e8;
     padding:5px 10px;border-radius:5px;cursor:pointer;font-family:inherit;
@@ -60,10 +63,7 @@
     content:'';position:absolute;inset:0;opacity:0;transition:.18s;
     background:radial-gradient(circle at 50% 50%,rgba(94,234,212,.12),transparent 70%);
   }
-  .level-card:hover{
-    border-color:#5eead4;transform:translateY(-2px);
-    box-shadow:0 8px 24px rgba(94,234,212,.18);
-  }
+  .level-card:hover{border-color:#5eead4;transform:translateY(-2px);box-shadow:0 8px 24px rgba(94,234,212,.18);}
   .level-card:hover::before{opacity:1;}
   .level-card:active{transform:scale(.97);}
   .card-badge{
@@ -72,10 +72,7 @@
     border:1px solid #2a2a4a;
   }
   .level-card:hover .card-badge{background:#123a35;color:#7dfbe1;border-color:#1e6b5e;}
-  .card-name{
-    color:#e2e8f0;font-size:13px;font-weight:bold;word-break:break-all;
-    padding-right:44px;line-height:1.4;
-  }
+  .card-name{color:#e2e8f0;font-size:13px;font-weight:bold;word-break:break-all;padding-right:44px;line-height:1.4;}
   .card-actions{position:absolute;bottom:6px;right:6px;display:flex;gap:4px;}
   .card-del{
     background:rgba(233,69,96,.12);border:1px solid rgba(233,69,96,.35);
@@ -84,21 +81,11 @@
   }
   .card-del:hover{background:#e94560;color:#fff;border-color:#e94560;}
 
-  .empty-tip{
-    grid-column:1/-1;text-align:center;color:#4a5270;font-size:12px;
-    padding:22px 10px;line-height:1.8;
-  }
+  .empty-tip{grid-column:1/-1;text-align:center;color:#4a5270;font-size:12px;padding:22px 10px;line-height:1.8;}
   .empty-tip span{font-size:11px;opacity:.75;}
-
-  .status{
-    margin-top:10px;font-size:11px;color:#4a5270;text-align:center;
-    min-height:16px;line-height:1.4;word-break:break-all;
-  }
+  .status{margin-top:10px;font-size:11px;color:#4a5270;text-align:center;min-height:16px;line-height:1.4;word-break:break-all;}
   .status.error{color:#e94560;}
-
-  .hint-text{
-    color:#6a7290;font-size:11px;line-height:1.7;margin-bottom:10px;
-  }
+  .hint-text{color:#6a7290;font-size:11px;line-height:1.7;margin-bottom:10px;}
 
   textarea{
     width:100%;background:#0a0a14;border:1px solid #26263f;color:#c8d0e8;
@@ -107,10 +94,7 @@
     touch-action:auto;-webkit-user-select:text;user-select:text;
   }
   textarea:focus{border-color:#3d3d66;background:#0f0f1e;}
-
-  .row{
-    display:flex;gap:8px;margin-top:8px;align-items:stretch;
-  }
+  .row{display:flex;gap:8px;margin-top:8px;align-items:stretch;}
   .row input{
     flex:1;min-width:0;background:#0a0a14;border:1px solid #26263f;color:#c8d0e8;
     padding:8px 11px;border-radius:6px;font-family:inherit;font-size:12px;outline:none;
@@ -128,29 +112,27 @@
   .btn.ghost{background:#1a1a2e;color:#a0a8c8;border-color:#2f2f4d;}
   .btn.ghost:hover{background:#252540;color:#fff;}
 
-  .menu-foot{
-    text-align:center;color:#3a3f58;font-size:10px;
-    margin-top:20px;line-height:1.8;
-  }
-  .menu-foot kbd{
-    background:#1a1a2e;color:#7dfbe1;border:1px solid #2a2a4a;
-    padding:1px 5px;border-radius:3px;font-size:10px;
-  }
+  .menu-foot{text-align:center;color:#3a3f58;font-size:10px;margin-top:20px;line-height:1.8;}
+  .menu-foot kbd{background:#1a1a2e;color:#7dfbe1;border:1px solid #2a2a4a;padding:1px 5px;border-radius:3px;font-size:10px;}
 
+  /* ============ 游戏全屏容器 ============ */
   #wrap{
-    position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:min(100vw,177.78vh);
-    width:min(100vw,177.78dvh);
-    aspect-ratio:960/540;
-    box-shadow:0 0 80px rgba(90,130,255,.25),0 0 0 1px rgba(120,150,255,.15);
-    border-radius:8px;overflow:hidden;display:none;
-    touch-action:none;
+    position:fixed;inset:0;
+    background:#000;
+    display:none;
+    align-items:center;justify-content:center;
+    overflow:hidden;
   }
-  #wrap.visible{display:block;}
-  canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none;}
+  #wrap.visible{display:flex;}
+  #game{
+    display:block;
+    cursor:crosshair;
+    touch-action:none;
+    /* 尺寸由 JS 动态计算，保持 16:9 居中 */
+  }
 
   .portrait-tip{
-    position:absolute;top:12px;left:50%;transform:translateX(-50%);
+    position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);
     background:rgba(94,234,212,.15);border:1px solid rgba(94,234,212,.45);
     color:#7dfbe1;padding:6px 16px;border-radius:20px;
     font-size:12px;display:none;z-index:20;pointer-events:none;
@@ -160,12 +142,63 @@
     #wrap.visible .portrait-tip{ display:block; }
   }
 
+  /* ============ 触屏按钮 ============ */
+  #touch-controls{
+    display:none;
+    position:fixed;inset:0;
+    pointer-events:none;
+    z-index:30;
+  }
+  body.is-touch #touch-controls{ display:block; }
+
+  #touch-move{
+    position:absolute;
+    left:calc(16px + env(safe-area-inset-left,0px));
+    bottom:calc(16px + env(safe-area-inset-bottom,0px));
+    display:flex;gap:14px;
+    pointer-events:none;
+  }
+  .touch-btn{
+    pointer-events:auto;
+    width:72px;height:72px;
+    border-radius:50%;
+    background:rgba(94,234,212,.16);
+    border:2px solid rgba(94,234,212,.55);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;font-weight:bold;
+    user-select:none;-webkit-user-select:none;
+    touch-action:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:background .1s,transform .1s,border-color .1s;
+    line-height:1;
+  }
+  .touch-btn.active{
+    background:rgba(94,234,212,.5);
+    border-color:rgba(94,234,212,.95);
+    transform:scale(.94);
+  }
+  #btn-jump{
+    position:absolute;
+    right:calc(16px + env(safe-area-inset-right,0px));
+    bottom:calc(16px + env(safe-area-inset-bottom,0px));
+    width:82px;height:82px;
+    font-size:32px;
+    background:rgba(167,139,250,.16);
+    border-color:rgba(167,139,250,.55);
+  }
+  #btn-jump.active{
+    background:rgba(167,139,250,.5);
+    border-color:rgba(167,139,250,.95);
+  }
+
+  /* ============ 退出按钮 ============ */
   #exit-btn{
     position:fixed;
-    top:calc(10px + env(safe-area-inset-top, 0px));
-    right:calc(12px + env(safe-area-inset-right, 0px));
+    top:calc(10px + env(safe-area-inset-top,0px));
+    right:calc(12px + env(safe-area-inset-right,0px));
     z-index:60;
-    background:rgba(20,20,40,.85);color:#c8d0e8;border:1px solid #26263f;
+    background:rgba(20,20,40,.88);color:#c8d0e8;border:1px solid #26263f;
     padding:8px 14px;border-radius:6px;cursor:pointer;font-family:inherit;
     font-size:12px;transition:.13s;display:none;backdrop-filter:blur(4px);
   }
@@ -173,10 +206,11 @@
   #exit-btn:hover{background:#252540;color:#fff;border-color:#3d3d66;}
   #exit-btn:active{transform:scale(.95);}
 
+  /* ============ 胜利界面 ============ */
   #win-overlay{
     position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;
     align-items:center;justify-content:center;
-    background:rgba(5,5,15,.85);backdrop-filter:blur(6px);
+    background:rgba(5,5,15,.88);backdrop-filter:blur(6px);
     opacity:0;pointer-events:none;transition:opacity .4s;
   }
   #win-overlay.visible{ opacity:1;pointer-events:auto; }
@@ -184,20 +218,17 @@
     font-size:56px;color:#fde047;text-shadow:0 0 30px #fde047;
     margin-bottom:10px;animation: bounceWin 1.5s infinite alternate;
   }
-  @keyframes bounceWin {
-    from { transform: translateY(0); }
-    to { transform: translateY(-12px); }
-  }
+  @keyframes bounceWin { from{transform:translateY(0);} to{transform:translateY(-12px);} }
   .win-sub{ font-size:18px;color:#e2e8f0;margin-bottom:40px; }
   .win-actions{ display:flex;gap:16px; }
-  .win-actions .btn{ padding: 10px 24px; font-size: 14px; }
+  .win-actions .btn{ padding:10px 24px; font-size:14px; }
 
   ::-webkit-scrollbar{width:8px;height:8px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:#252540;border-radius:4px;}
   ::-webkit-scrollbar-thumb:hover{background:#343460;}
 
-  /* ---------- 小屏 / 手机适配 ---------- */
+  /* ============ 小屏适配 ============ */
   @media (max-width: 600px){
     .menu-inner{ padding:18px 12px 28px; }
     .menu-head{ margin-bottom:18px; }
@@ -274,6 +305,15 @@
 <div id="wrap">
   <canvas id="game"></canvas>
   <div class="portrait-tip">📱 建议横屏游玩</div>
+
+  <div id="touch-controls">
+    <div id="touch-move">
+      <div class="touch-btn" id="btn-left">◀</div>
+      <div class="touch-btn" id="btn-right">▶</div>
+    </div>
+    <div class="touch-btn" id="btn-jump">↑</div>
+  </div>
+
   <div id="win-overlay">
     <h2 class="win-title">🏆 YOU WIN!</h2>
     <div class="win-sub">死亡次数: <span id="win-deaths">0</span></div>
@@ -283,7 +323,7 @@
     </div>
   </div>
 </div>
-<button id="exit-btn">✕ 退出关卡</button>
+<button id="exit-btn">✕ 退出</button>
 
 <script>
 (function(){
@@ -310,6 +350,17 @@ var currentLevelIndex = -1;
 
 var LS_INDEX = 'iwsl_index';
 var LS_DATA_PREFIX = 'iwsl_data_';
+
+/* ============================================================
+ *  设备检测（触屏才显示触屏按钮）
+ * ============================================================ */
+var isTouchDevice = ('ontouchstart' in window) ||
+                    (navigator.maxTouchPoints > 0) ||
+                    (navigator.msMaxTouchPoints > 0);
+
+if(isTouchDevice){
+  document.body.classList.add('is-touch');
+}
 
 /* ============================================================
  *  本地存储
@@ -436,7 +487,46 @@ function buildLevelCard(item, index){
   return card;
 }
 
+/* ============================================================
+ *  全屏 / 退出
+ * ============================================================ */
+function tryFullscreen(){
+  try{
+    var el = document.documentElement;
+    if(el.requestFullscreen){
+      var p = el.requestFullscreen();
+      if(p && p.catch) p.catch(function(){});
+    } else if(el.webkitRequestFullscreen){
+      el.webkitRequestFullscreen();
+    } else if(el.msRequestFullscreen){
+      el.msRequestFullscreen();
+    }
+  }catch(e){}
+}
+
+function tryExitFullscreen(){
+  try{
+    if(document.fullscreenElement){
+      if(document.exitFullscreen) document.exitFullscreen().catch(function(){});
+      else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+  }catch(e){}
+}
+
+/* 浏览器返回键 / 手势返回：如果在关卡内则回到选关 */
+window.addEventListener('popstate', function(){
+  if(wrapEl.classList.contains('visible')){
+    exitLevel(true);
+  }
+});
+
+/* ============================================================
+ *  进入关卡
+ * ============================================================ */
 function enterLevel(item, index){
+  // 在点击手势上下文中尝试全屏（移动端）
+  tryFullscreen();
+
   currentLevelIndex = (index !== undefined) ? index : allLevels.indexOf(item);
 
   if(item.type === 'local'){
@@ -480,6 +570,12 @@ function loadAndStart(raw, displayName){
   wrapEl.classList.add('visible');
   exitBtn.classList.add('visible');
 
+  // 让 canvas 适配全屏（保持 16:9 居中）
+  resizeGameCanvas();
+
+  // 压入历史记录，让浏览器返回键可以回到选关
+  try{ history.pushState({ inGame: true }, '', location.href); }catch(e){}
+
   try{
     currentGame = startGameEngine(newCvs, level, function(deaths){
       showWinScreen(deaths);
@@ -488,10 +584,42 @@ function loadAndStart(raw, displayName){
     wrapEl.classList.remove('visible');
     exitBtn.classList.remove('visible');
     menuEl.classList.remove('hidden');
+    tryExitFullscreen();
     alert('游戏启动失败：' + e.message);
   }
 }
 
+/* ============================================================
+ *  Canvas 尺寸计算（保持 16:9 居中，全屏黑边填充）
+ * ============================================================ */
+function resizeGameCanvas(){
+  var cvs = document.getElementById('game');
+  if(!cvs || !wrapEl.classList.contains('visible')) return;
+
+  var vw = window.innerWidth;
+  var vh = window.innerHeight;
+  var ratio = 960 / 540;
+
+  var cw, ch;
+  if(vw / vh > ratio){
+    ch = vh;
+    cw = vh * ratio;
+  } else {
+    cw = vw;
+    ch = vw / ratio;
+  }
+  cvs.style.width = cw + 'px';
+  cvs.style.height = ch + 'px';
+}
+
+window.addEventListener('resize', resizeGameCanvas);
+window.addEventListener('orientationchange', function(){
+  setTimeout(resizeGameCanvas, 120);
+});
+
+/* ============================================================
+ *  胜利 / 退出
+ * ============================================================ */
 function showWinScreen(deaths){
   winDeathsEl.textContent = deaths;
   winOverlay.classList.add('visible');
@@ -522,6 +650,8 @@ function exitLevel(skipConfirm){
   exitBtn.classList.remove('visible');
   menuEl.classList.remove('hidden');
 
+  tryExitFullscreen();
+
   var cvs = document.getElementById('game');
   if(cvs){ var ctx = cvs.getContext('2d'); ctx.clearRect(0,0,cvs.width,cvs.height); }
 }
@@ -535,6 +665,9 @@ btnNextLevel.addEventListener('click', function(){
   }
 });
 
+/* ============================================================
+ *  菜单表单
+ * ============================================================ */
 $('btn-save-local').addEventListener('click', function(){
   var txt = pasteBox.value.trim();
   if(!txt){ alert('请先粘贴关卡 JSON 文本'); return; }
@@ -577,7 +710,7 @@ $('btn-download').addEventListener('click', function(){
 $('btn-refresh').addEventListener('click', refreshLevelList);
 
 /* ============================================================
- *  关卡数据规范化（保留编辑器导出的全部字段）
+ *  关卡数据规范化
  * ============================================================ */
 function num(v, def){
   var n = Number(v);
@@ -644,7 +777,6 @@ function normalizeLevel(d){
     enemies: [], checkpoints: [], goal: null
   };
 
-  /* ---------- 实体方块 ---------- */
   (d.solids || []).forEach(function(s){
     s = s || {};
     var w = posNum(s.w, 1), h = posNum(s.h, 1);
@@ -660,7 +792,6 @@ function normalizeLevel(d){
     });
   });
 
-  /* ---------- 移动平台 ---------- */
   (d.movers || []).forEach(function(m){
     m = m || {};
     var w = posNum(m.w, 1), h = posNum(m.h, 1);
@@ -684,7 +815,6 @@ function normalizeLevel(d){
     });
   });
 
-  /* ---------- 普通尖刺 ---------- */
   (d.spikes || []).forEach(function(s){
     s = s || {};
     L.spikes.push({
@@ -693,7 +823,6 @@ function normalizeLevel(d){
     });
   });
 
-  /* ---------- 自设尖刺 ---------- */
   (d.adv_spikes || []).forEach(function(s){
     s = s || {};
     var w = posNum(s.w, 1), h = posNum(s.h, 1);
@@ -720,7 +849,6 @@ function normalizeLevel(d){
     });
   });
 
-  /* ---------- 敌人 ---------- */
   (d.enemies || []).forEach(function(e){
     e = e || {};
     var type = e.type === 'shooter' ? 'shooter' : 'walker';
@@ -756,7 +884,6 @@ function normalizeLevel(d){
     L.enemies.push(base);
   });
 
-  /* ---------- 存档点 ---------- */
   (d.checkpoints || []).forEach(function(c){
     c = c || {};
     var cx = num(c.x, 0), cy = num(c.y, 0);
@@ -770,7 +897,6 @@ function normalizeLevel(d){
     });
   });
 
-  /* ---------- 终点 ---------- */
   if(d.goal && (posNum(d.goal.w, 0) > 0 || posNum(d.goal.h, 0) > 0)){
     L.goal = {
       x: num(d.goal.x, 0),
@@ -786,7 +912,7 @@ function normalizeLevel(d){
 }
 
 /* ============================================================
- *  游戏引擎（含手机触屏控制）
+ *  游戏引擎
  * ============================================================ */
 function startGameEngine(cvs, L, onWinCallback){
 
@@ -841,7 +967,7 @@ function startGameEngine(cvs, L, onWinCallback){
     if(e.damage === undefined) e.damage = 1;
   });
 
-  /* ---------- 碰撞箱计算（支持绝对 / 相对 + 形变） ---------- */
+  /* ---------- 碰撞箱计算 ---------- */
   function getHitboxRect(ent, h, t) {
     if (!h.isRelative) {
       return { x: h.x, y: h.y, w: h.w, h: h.h };
@@ -893,109 +1019,118 @@ function startGameEngine(cvs, L, onWinCallback){
     }catch(e){}
   }
 
-  /* ---------- 输入 ---------- */
-  var keys = {};
-  var mouse = { x: W*0.8, y: H/2, down: false };
-
-  /* ---------- 触屏控制状态 ---------- */
-  var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
-
-  var touchState = { left: false, right: false, jump: false };
-  var touchAimActive = false;
-  var touchAimX = W * 0.8;
-  var touchAimY = H / 2;
-  var activeTouches = {};
-  var lastTouchTime = 0;
-
-  var TOUCH_BTN = {
-    left:  { x: 95,      y: H - 95, r: 54 },
-    right: { x: 218,     y: H - 95, r: 54 },
-    jump:  { x: W - 95,  y: H - 95, r: 58 }
+  /* ---------- 状态（先声明 player，按钮事件里会用到） ---------- */
+  var state = {
+    mode: 'play', deaths: 0, camX: 0, shake: 0, deadTimer: 0, winTimer: 0, t: 0,
+    spawn: { x: SPAWN.x, y: SPAWN.y }
   };
+  var player = {
+    x: SPAWN.x, y: SPAWN.y, w: 14, h: 22, vx: 0, vy: 0,
+    onGround: false, ground: null, jumpsLeft: 1, coyote: 0, jumpBuffer: 0,
+    facing: 1, shootCd: 0, aimAngle: 0,
+    maxHp: MAX_HP, hp: MAX_HP, invTimer: 0,
+    slowTimer: 0, fastTimer: 0, bounceCd: 0
+  };
+  var bullets = [], enemyBullets = [], particles = [];
 
-  function touchToLogic(t){
+  /* ============================================================
+   *  触摸输入
+   * ============================================================ */
+  var touchState = { left: false, right: false, jump: false };
+
+  // 触摸射击：记录第一个落在 canvas 上的触摸
+  var aimTouchId = null;
+  var aimLogicX = W * 0.8;
+  var aimLogicY = H / 2;
+  var touchAimActive = false;
+
+  function getCanvasPos(t){
     var r = cvs.getBoundingClientRect();
     return {
       x: (t.clientX - r.left) * (W / r.width),
       y: (t.clientY - r.top)  * (H / r.height)
     };
   }
-  function inBtn(p, b){
-    var dx = p.x - b.x, dy = p.y - b.y;
-    var rr = b.r + 10;
-    return dx*dx + dy*dy <= rr*rr;
-  }
-  function refreshAimState(){
-    var hasAim = false;
-    for(var id in activeTouches){
-      if(activeTouches[id] === 'aim'){ hasAim = true; break; }
-    }
-    touchAimActive = hasAim;
-  }
 
-  function onTouchStart(e){
+  function onCanvasTouchStart(e){
     e.preventDefault();
-    lastTouchTime = Date.now();
     initAudio();
     for(var i = 0; i < e.changedTouches.length; i++){
       var t = e.changedTouches[i];
-      var id = t.identifier;
-      if(activeTouches[id]) continue;
-      var p = touchToLogic(t);
-
-      if(inBtn(p, TOUCH_BTN.left)){
-        activeTouches[id] = 'left';
-        touchState.left = true;
-      } else if(inBtn(p, TOUCH_BTN.right)){
-        activeTouches[id] = 'right';
-        touchState.right = true;
-      } else if(inBtn(p, TOUCH_BTN.jump)){
-        activeTouches[id] = 'jump';
-        touchState.jump = true;
-        player.jumpBuffer = 8;
-      } else {
-        activeTouches[id] = 'aim';
-        touchAimX = p.x;
-        touchAimY = p.y;
-        refreshAimState();
+      if(aimTouchId === null){
+        aimTouchId = t.identifier;
+        var p = getCanvasPos(t);
+        aimLogicX = p.x;
+        aimLogicY = p.y;
+        touchAimActive = true;
+      }
+    }
+  }
+  function onCanvasTouchMove(e){
+    e.preventDefault();
+    for(var i = 0; i < e.changedTouches.length; i++){
+      var t = e.changedTouches[i];
+      if(t.identifier === aimTouchId){
+        var p = getCanvasPos(t);
+        aimLogicX = p.x;
+        aimLogicY = p.y;
+      }
+    }
+  }
+  function onCanvasTouchEnd(e){
+    e.preventDefault();
+    for(var i = 0; i < e.changedTouches.length; i++){
+      var t = e.changedTouches[i];
+      if(t.identifier === aimTouchId){
+        aimTouchId = null;
+        touchAimActive = false;
       }
     }
   }
 
-  function onTouchMove(e){
-    e.preventDefault();
-    lastTouchTime = Date.now();
-    for(var i = 0; i < e.changedTouches.length; i++){
-      var t = e.changedTouches[i];
-      if(activeTouches[t.identifier] === 'aim'){
-        var p = touchToLogic(t);
-        touchAimX = p.x;
-        touchAimY = p.y;
-      }
+  on(cvs, 'touchstart', onCanvasTouchStart, { passive: false });
+  on(cvs, 'touchmove',  onCanvasTouchMove,  { passive: false });
+  on(cvs, 'touchend',   onCanvasTouchEnd,   { passive: false });
+  on(cvs, 'touchcancel',onCanvasTouchEnd,   { passive: false });
+
+  /* ---------- 触屏按钮（HTML 元素，固定在屏幕边缘） ---------- */
+  function bindHoldButton(btn, onDown, onUp){
+    if(!btn) return;
+    function down(e){
+      e.preventDefault();
+      e.stopPropagation();
+      initAudio();
+      btn.classList.add('active');
+      onDown();
     }
+    function up(e){
+      e.preventDefault();
+      e.stopPropagation();
+      btn.classList.remove('active');
+      onUp();
+    }
+    on(btn, 'touchstart', down, { passive: false });
+    on(btn, 'touchend',   up,   { passive: false });
+    on(btn, 'touchcancel',up,   { passive: false });
   }
 
-  function onTouchEnd(e){
-    e.preventDefault();
-    lastTouchTime = Date.now();
-    for(var i = 0; i < e.changedTouches.length; i++){
-      var t = e.changedTouches[i];
-      var role = activeTouches[t.identifier];
-      if(!role) continue;
-      if(role === 'left')  touchState.left = false;
-      else if(role === 'right') touchState.right = false;
-      else if(role === 'jump')  touchState.jump = false;
-      delete activeTouches[t.identifier];
-    }
-    refreshAimState();
-  }
+  bindHoldButton($('btn-left'),
+    function(){ touchState.left = true; },
+    function(){ touchState.left = false; });
 
-  on(cvs, 'touchstart',  onTouchStart, { passive: false });
-  on(cvs, 'touchmove',   onTouchMove,  { passive: false });
-  on(cvs, 'touchend',    onTouchEnd,   { passive: false });
-  on(cvs, 'touchcancel', onTouchEnd,   { passive: false });
+  bindHoldButton($('btn-right'),
+    function(){ touchState.right = true; },
+    function(){ touchState.right = false; });
+
+  bindHoldButton($('btn-jump'),
+    function(){ touchState.jump = true; player.jumpBuffer = 8; },
+    function(){ touchState.jump = false; });
 
   /* ---------- 键盘 ---------- */
+  var keys = {};
+  var mouse = { x: W*0.8, y: H/2, down: false };
+  var lastTouchTime = 0;
+
   on(window, 'keydown', function(e){
     if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.code) >= 0) e.preventDefault();
     if(!keys[e.code]){
@@ -1011,18 +1146,18 @@ function startGameEngine(cvs, L, onWinCallback){
     mouse.down = false;
     touchState.left = touchState.right = touchState.jump = false;
     touchAimActive = false;
-    activeTouches = {};
+    aimTouchId = null;
   });
 
-  /* ---------- 鼠标（触摸设备上忽略触摸后 400ms 内的模拟鼠标事件） ---------- */
+  /* ---------- 鼠标（过滤触摸后 500ms 内的模拟鼠标事件） ---------- */
   on(cvs, 'mousemove', function(e){
-    if(Date.now() - lastTouchTime < 400) return;
+    if(Date.now() - lastTouchTime < 500) return;
     var r = cvs.getBoundingClientRect();
     mouse.x = (e.clientX - r.left) * (W / r.width);
     mouse.y = (e.clientY - r.top)  * (H / r.height);
   });
   on(cvs, 'mousedown', function(e){
-    if(Date.now() - lastTouchTime < 400) return;
+    if(Date.now() - lastTouchTime < 500) return;
     mouse.down = true;
     initAudio();
     e.preventDefault();
@@ -1030,19 +1165,8 @@ function startGameEngine(cvs, L, onWinCallback){
   on(window, 'mouseup', function(){ mouse.down = false; });
   on(cvs, 'contextmenu', function(e){ e.preventDefault(); });
 
-  /* ---------- 状态 ---------- */
-  var state = {
-    mode: 'play', deaths: 0, camX: 0, shake: 0, deadTimer: 0, winTimer: 0, t: 0,
-    spawn: { x: SPAWN.x, y: SPAWN.y }
-  };
-  var player = {
-    x: SPAWN.x, y: SPAWN.y, w: 14, h: 22, vx: 0, vy: 0,
-    onGround: false, ground: null, jumpsLeft: 1, coyote: 0, jumpBuffer: 0,
-    facing: 1, shootCd: 0, aimAngle: 0,
-    maxHp: MAX_HP, hp: MAX_HP, invTimer: 0,
-    slowTimer: 0, fastTimer: 0, bounceCd: 0
-  };
-  var bullets = [], enemyBullets = [], particles = [];
+  // 触摸时更新 lastTouchTime（阻止触摸后的模拟鼠标事件）
+  on(window, 'touchstart', function(){ lastTouchTime = Date.now(); }, { passive: true });
 
   /* ---------- 轨迹运动 ---------- */
   function updatePath(e){
@@ -1250,13 +1374,15 @@ function startGameEngine(cvs, L, onWinCallback){
 
     if(p.invTimer > 0) p.invTimer--;
 
-    var aimX = touchAimActive ? touchAimX : mouse.x;
-    var aimY = touchAimActive ? touchAimY : mouse.y;
+    // 瞄准：触屏优先，否则鼠标
+    var aimX = touchAimActive ? aimLogicX : mouse.x;
+    var aimY = touchAimActive ? aimLogicY : mouse.y;
     var wmx = aimX + state.camX;
     p.aimAngle = Math.atan2(aimY - (p.y + p.h/2), wmx - (p.x + p.w/2));
 
     if(p.shootCd > 0) p.shootCd--;
-    if((mouse.down || keys['KeyJ'] || touchAimActive) && p.shootCd <= 0){
+    var wantShoot = mouse.down || keys['KeyJ'] || touchAimActive;
+    if(wantShoot && p.shootCd <= 0){
       shoot();
       p.shootCd = 9;
     }
@@ -1504,7 +1630,6 @@ function startGameEngine(cvs, L, onWinCallback){
   function checkHazards(){
     var p = player, i;
 
-    // 普通尖刺
     for(i=0;i<spikes.length;i++){
       var s = spikes[i];
       var spx = Math.min(3, s.w * 0.25), spy = Math.min(7, s.h * 0.4);
@@ -1514,7 +1639,6 @@ function startGameEngine(cvs, L, onWinCallback){
       })){ killPlayer(); return; }
     }
 
-    // 敌人（扣血）
     for(i=0;i<enemies.length;i++){
       var e = enemies[i];
       if(!e.alive || e._hidden) continue;
@@ -1533,10 +1657,8 @@ function startGameEngine(cvs, L, onWinCallback){
       }
     }
 
-    // 掉出屏幕
     if(p.y > H + 120){ killPlayer(); return; }
 
-    // 自设尖刺
     for(i=0;i<adv_spikes.length;i++){
       var s2 = adv_spikes[i];
       var triggerVis = false, triggerDmg = false;
@@ -1593,7 +1715,6 @@ function startGameEngine(cvs, L, onWinCallback){
       }
     }
 
-    // 存档点
     for(i=0;i<checkpoints.length;i++){
       var c = checkpoints[i];
       if(!c.active){
@@ -1613,7 +1734,6 @@ function startGameEngine(cvs, L, onWinCallback){
       }
     }
 
-    // 终点
     if(rectHit(p, goal)){
       state.mode = 'win';
       state.winTimer = 0;
@@ -2072,7 +2192,6 @@ function startGameEngine(cvs, L, onWinCallback){
     ctx.fillStyle = '#e2e8f0';
     ctx.fillText(('00' + state.deaths).slice(-3), 118, 33);
 
-    // 血量：≤8 用图标，>8 用紧凑文字
     if (player.maxHp <= 8) {
       for (var i=0; i<player.maxHp; i++) {
         ctx.beginPath();
@@ -2092,7 +2211,7 @@ function startGameEngine(cvs, L, onWinCallback){
     ctx.font = '13px "Courier New",monospace';
     ctx.textAlign = 'right';
     if (isTouchDevice) {
-      ctx.fillText('左侧移动 · 右侧点击射击 · ↑跳跃', W - 18, 32);
+      ctx.fillText('左下移动 · 右下跳跃 · 点空白射击', W - 18, 32);
     } else {
       ctx.fillText('A/D 移动 · SPACE 跳跃(二段) · 鼠标射击 · R 重来', W - 18, 32);
     }
@@ -2107,8 +2226,9 @@ function startGameEngine(cvs, L, onWinCallback){
     ctx.fillStyle = '#5eead4';
     ctx.beginPath(); ctx.arc(W/2 - 180 + 360*prog, H - 19.5, 4, 0, Math.PI*2); ctx.fill();
 
-    var mx = touchAimActive ? touchAimX : mouse.x;
-    var my = touchAimActive ? touchAimY : mouse.y;
+    // 准星：触屏时显示在触摸位置，否则鼠标位置
+    var mx = touchAimActive ? aimLogicX : mouse.x;
+    var my = touchAimActive ? aimLogicY : mouse.y;
     ctx.strokeStyle = 'rgba(253,224,71,0.85)';
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.arc(mx, my, 9, 0, Math.PI*2); ctx.stroke();
@@ -2118,36 +2238,6 @@ function startGameEngine(cvs, L, onWinCallback){
     ctx.moveTo(mx, my - 15); ctx.lineTo(mx, my - 5);
     ctx.moveTo(mx, my + 5);  ctx.lineTo(mx, my + 15);
     ctx.stroke();
-  }
-
-  /* ---------- 触屏按钮绘制 ---------- */
-  function drawTouchButton(b, label, active, color){
-    ctx.save();
-
-    ctx.globalAlpha = active ? 0.55 : 0.2;
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
-
-    ctx.globalAlpha = active ? 1 : 0.5;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.5;
-    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.stroke();
-
-    ctx.globalAlpha = active ? 1 : 0.75;
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold ' + Math.round(b.r * 0.95) + 'px -apple-system, "Segoe UI", "PingFang SC", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, b.x, b.y + 2);
-
-    ctx.restore();
-  }
-
-  function drawTouchControls(){
-    if(!isTouchDevice) return;
-    drawTouchButton(TOUCH_BTN.left,  '◀', touchState.left,  '#5eead4');
-    drawTouchButton(TOUCH_BTN.right, '▶', touchState.right, '#5eead4');
-    drawTouchButton(TOUCH_BTN.jump,  '↑', touchState.jump,  '#a78bfa');
   }
 
   function drawDeadOverlay(){
@@ -2181,7 +2271,6 @@ function startGameEngine(cvs, L, onWinCallback){
 
     drawHUD();
     drawDeadOverlay();
-    drawTouchControls();
   }
 
   /* ---------- 主循环 ---------- */
@@ -2222,6 +2311,13 @@ function startGameEngine(cvs, L, onWinCallback){
         try{ l.target.removeEventListener(l.event, l.fn, l.opts); }catch(e){}
       }
       listeners = [];
+      // 清理按钮 active 状态
+      var bl = document.getElementById('btn-left');
+      var br = document.getElementById('btn-right');
+      var bj = document.getElementById('btn-jump');
+      if(bl) bl.classList.remove('active');
+      if(br) br.classList.remove('active');
+      if(bj) bj.classList.remove('active');
     }
   };
 }
