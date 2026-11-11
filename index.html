@@ -569,7 +569,7 @@ function normalizeLevel(d){
   };
 
   (d.solids || []).forEach(function(s){
-    L.solids.push({ x:+s.x||0, y:+s.y||0, w:+s.w||1, h:+s.h||1, hitboxes: s.hitboxes || [] });
+    L.solids.push({ x:+s.x||0, y:+s.y||0, w:+s.w||1, h:+s.h||1, morph: s.morph || 'none', targetW: s.targetW || +s.w||1, targetH: s.targetH || +s.h||1, hitboxes: s.hitboxes || [] });
   });
 
   (d.movers || []).forEach(function(m){
@@ -582,6 +582,7 @@ function normalizeLevel(d){
       phase: m.phase || 0, dx:0, dy:0,
       path: m.path || [], pathSpeed: m.pathSpeed || 2,
       pathDist: m.pathDist || 0, pathDir: m.pathDir || 1,
+      morph: m.morph || 'none', targetW: m.targetW || +m.w||1, targetH: m.targetH || +m.h||1,
       hitboxes: m.hitboxes || []
     });
   });
@@ -598,6 +599,7 @@ function normalizeLevel(d){
       visibility: s.visibility || 'always',
       morph: s.morph || 'none',
       layer: s.layer || 'top',
+      targetW: s.targetW || +s.w||1, targetH: s.targetH || +s.h||1,
       hitboxes: s.hitboxes || [],
       phase: s.phase || 0,
       ox: (s.ox !== undefined ? +s.ox : (+s.x||0)),
@@ -649,7 +651,7 @@ function normalizeLevel(d){
 }
 
 /* ============================================================
-   游戏引擎（已与最新版编辑器模板完全同步）
+   游戏引擎
    ============================================================ */
 function startGameEngine(cvs, L, onWinCallback){
 
@@ -682,6 +684,23 @@ var adv_spikes   = L.adv_spikes;
 var enemies      = L.enemies;
 var checkpoints  = L.checkpoints;
 var goal         = L.goal;
+
+// 初始化形变属性
+staticSolids.forEach(function(e){
+    e.ow = e.w; e.oh = e.h; e.ox = e.x; e.oy = e.y;
+    if(e.hitboxes) e.hitboxes.forEach(function(h){ h._hits = 0; h._curCollide = false; });
+});
+movers.forEach(function(e){
+    e.ow = e.w; e.oh = e.h; e.ox = e.x; e.oy = e.y;
+    if(e.hitboxes) e.hitboxes.forEach(function(h){ h._hits = 0; h._curCollide = false; });
+});
+adv_spikes.forEach(function(e){
+    e.ow = e.w; e.oh = e.h; e.ox = e.x; e.oy = e.y;
+    if(e.hitboxes) e.hitboxes.forEach(function(h){ h._hits = 0; h._curCollide = false; });
+});
+enemies.forEach(function(e){
+    if(e.hitboxes) e.hitboxes.forEach(function(h){ h._hits = 0; h._curCollide = false; });
+});
 
 var solids = staticSolids.concat(movers);
 
@@ -757,6 +776,34 @@ function updatePath(e){
   }
 }
 
+function updateMorphs() {
+    var all = solids.concat(adv_spikes);
+    for(var i=0; i<all.length; i++){
+        var e = all[i];
+        if(e.morph === 'pulse'){
+            var scale = 1 + Math.sin(state.t * 0.1) * 0.2;
+            var newW = e.ow * scale;
+            var newH = e.oh * scale;
+        } else if(e.morph === 'stretch'){
+            var t = (Math.sin(state.t * 0.05) + 1) / 2;
+            var newW = e.ow + ((e.targetW || e.ow) - e.ow) * t;
+            var newH = e.oh + ((e.targetH || e.oh) - e.oh) * t;
+        } else {
+            var newW = e.ow;
+            var newH = e.oh;
+        }
+
+        if (newW !== e.w || newH !== e.h) {
+            var cx = e.x + e.w / 2;
+            var cy = e.y + e.h / 2;
+            e.w = newW;
+            e.h = newH;
+            e.x = cx - e.w / 2;
+            e.y = cy - e.h / 2;
+        }
+    }
+}
+
 function addParticles(x, y, n, color, spd, life){
   life = life || 30;
   for(var i=0;i<n;i++){
@@ -792,13 +839,11 @@ function moveEntity(e, list){
     }
   }
 }
-
 function updateMovers(){
   for(var i=0;i<movers.length;i++){
     var m = movers[i];
     var px = m.x, py = m.y;
     
-    // 【同步】检查移动平台自身的触发状态
     var triggerMove = false, hasMoveTrigger = false;
     if (m.hitboxes) {
       for(var j=0; j<m.hitboxes.length; j++){
@@ -807,7 +852,9 @@ function updateMovers(){
           hasMoveTrigger = true;
           var hx = h.isRelative ? m.x + h.x : h.x;
           var hy = h.isRelative ? m.y + h.y : h.y;
-          if (rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})) triggerMove = true;
+          if (rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})) {
+              if(h._hits > (h.triggerCount || 0)) triggerMove = true;
+          }
         }
       }
     }
@@ -827,7 +874,6 @@ function updateMovers(){
     if(player.onGround && player.ground === m && state.mode === 'play'){ player.x += m.dx; player.y += m.dy; }
   }
 }
-
 function updatePlayer(){
   var p = player;
   if(p.slowTimer > 0) p.slowTimer--;
@@ -927,8 +973,7 @@ function updateAdvSpikes(){
   for(var i=0;i<adv_spikes.length;i++){
     var s = adv_spikes[i];
     var triggerMove = false, hasMoveTrigger = false;
-    
-    // 【同步】检查自设尖刺自身的触发状态
+
     if (s.hitboxes) {
       for(var j=0; j<s.hitboxes.length; j++){
         var h = s.hitboxes[j];
@@ -936,13 +981,15 @@ function updateAdvSpikes(){
           hasMoveTrigger = true;
           var hx = h.isRelative ? s.x + h.x : h.x;
           var hy = h.isRelative ? s.y + h.y : h.y;
-          if (rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})) triggerMove = true;
+          if (rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})) {
+              if(h._hits > (h.triggerCount || 0)) triggerMove = true;
+          }
         }
       }
     }
-    
+
     s._activeMove = hasMoveTrigger ? triggerMove : true;
-    
+
     if (s._activeMove) {
       if (s.path && s.path.length >= 2) {
         updatePath(s);
@@ -970,12 +1017,12 @@ function isAdvSpikeVisible(s){
 function checkHitboxTriggers(){
   var p = player;
   var allEnts = staticSolids.concat(movers).concat(adv_spikes).concat(enemies);
-  
+
   for(var i=0; i<allEnts.length; i++){
     allEnts[i]._trigMove = false;
     allEnts[i]._trigVis = false;
   }
-  
+
   for(var i=0; i<allEnts.length; i++){
     var ent = allEnts[i];
     if(!ent.hitboxes) continue;
@@ -983,20 +1030,28 @@ function checkHitboxTriggers(){
       var hb = ent.hitboxes[j];
       var hx = hb.isRelative ? ent.x + hb.x : hb.x;
       var hy = hb.isRelative ? ent.y + hb.y : hb.y;
-      
-      if(rectHit(p, {x:hx, y:hy, w:hb.w, h:hb.h})){
-        if(hb.triggerMove) ent._trigMove = true;
-        if(hb.triggerVisibility) ent._trigVis = true;
-        
-        if(hb.triggerSlow) p.slowTimer = 20;
-        if(hb.triggerFast) p.fastTimer = 20;
-        if(hb.triggerBounce && p.bounceCd <= 0){
+
+      var isCol = rectHit(p, {x:hx, y:hy, w:hb.w, h:hb.h});
+      if (isCol && !hb._curCollide) {
+          hb._hits++;
+      }
+      hb._curCollide = isCol;
+
+      var canTrig = hb._hits > (hb.triggerCount || 0);
+
+      if (isCol && canTrig) {
+        if (hb.triggerMove) ent._trigMove = true;
+        if (hb.triggerVisibility) ent._trigVis = true;
+
+        if (hb.triggerSlow) p.slowTimer = 20;
+        if (hb.triggerFast) p.fastTimer = 20;
+        if (hb.triggerBounce && p.bounceCd <= 0){
           p.vx = 0; p.vy = -12; p.bounceCd = 40; beep(600, 0.1, 'sine', 0.05);
         }
       }
     }
   }
-  
+
   for(var i=0; i<allEnts.length; i++){
     var ent = allEnts[i];
     if(ent.hitboxes && ent.hitboxes.length > 0){
@@ -1023,31 +1078,40 @@ function checkHazards(){
     var s = adv_spikes[i];
     var triggerVis = false, triggerDmg = false;
     var hasVisTrigger = false, hasDmgTrigger = false;
-    
+
     if(s.hitboxes){
       for(var j=0; j<s.hitboxes.length; j++){
         var h = s.hitboxes[j];
         if(h.triggerVisibility) hasVisTrigger = true;
         if(h.triggerDamage) hasDmgTrigger = true;
-        
+
         var hx = h.isRelative ? s.x + h.x : h.x;
         var hy = h.isRelative ? s.y + h.y : h.y;
-        if(rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})){
-          if(h.triggerVisibility) triggerVis = true;
-          if(h.triggerDamage) triggerDmg = true;
+
+        var isCol = rectHit(player, {x: hx, y: hy, w: h.w, h: h.h});
+        if (isCol && !h._curCollide) {
+            h._hits++;
+        }
+        h._curCollide = isCol;
+
+        var canTrig = h._hits > (h.triggerCount || 0);
+
+        if (isCol && canTrig) {
+          if (h.triggerVisibility) triggerVis = true;
+          if (h.triggerDamage) triggerDmg = true;
         }
       }
     }
-    
+
     s._activeVis = hasVisTrigger ? triggerVis : true;
     s._activeDmg = hasDmgTrigger ? triggerDmg : true;
-    
+
     if(s._activeVis && isAdvSpikeVisible(s)){
       var hitSpike = false;
       if(hasDmgTrigger){
         for(var j=0; j<s.hitboxes.length; j++){
           var h = s.hitboxes[j];
-          if(h.triggerDamage){
+          if(h.triggerDamage && h._hits > (h.triggerCount || 0)){
             var hx = h.isRelative ? s.x + h.x : h.x;
             var hy = h.isRelative ? s.y + h.y : h.y;
             if(rectHit(player, {x: hx, y: hy, w: h.w, h: h.h})){ hitSpike = true; break; }
@@ -1056,7 +1120,7 @@ function checkHazards(){
       } else {
         if(rectHit(player, {x:s.x+3, y:s.y+3, w:s.w-6, h:s.h-6})) hitSpike = true;
       }
-      
+
       if(hitSpike){
         if(player.invTimer <= 0){
           player.hp -= s.damage;
@@ -1078,7 +1142,7 @@ function checkHazards(){
       } else {
         hit = rectHit(p, c);
       }
-      
+
       if(hit){
         c.active = true;
         state.spawn = { x: c.spawnX, y: c.spawnY };
@@ -1106,9 +1170,46 @@ function respawn(){
   enemyBullets.length = 0; state.mode = 'play';
   state.camX = clamp(player.x + player.w/2 - W/2, 0, Math.max(0, WORLD_W - W));
   addParticles(player.x + player.w/2, player.y + player.h/2, 16, '#5eead4', 4, 28);
+
+  // 死亡后重置触发器和相关实体
+  var allEnts = staticSolids.concat(movers).concat(adv_spikes).concat(enemies);
+  for(var i=0; i<allEnts.length; i++) {
+      var ent = allEnts[i];
+      var shouldReset = false;
+      if(ent.hitboxes) {
+          for(var j=0; j<ent.hitboxes.length; j++) {
+              var hb = ent.hitboxes[j];
+              hb._curCollide = false;
+              if (hb.resetOnDeath || hb.resetOnDeath === undefined) {
+                  hb._hits = 0;
+                  shouldReset = true;
+              }
+          }
+      }
+      // 如果该实体的触发状态被重置了，把位置和运动状态也复位
+      if (shouldReset) {
+          if (ent.path) ent.pathDist = 0;
+          ent.phase = 0;
+          if (ent.ox !== undefined) ent.x = ent.ox;
+          if (ent.oy !== undefined) ent.y = ent.oy;
+      }
+  }
+  // 重置一下所有敌人的存活状态
+  for(var i=0; i<enemies.length; i++){
+      enemies[i].alive = true;
+  }
+  // 重置自设尖刺的显隐状态
+  for(var i=0; i<adv_spikes.length; i++){
+      adv_spikes[i]._activeVis = false;
+      adv_spikes[i]._activeDmg = false;
+  }
+  // 重置移动平台的激活状态
+  for(var i=0; i<movers.length; i++){
+      movers[i]._activeMove = false;
+  }
 }
 function update(){
-  state.t++; updateMovers(); updateAdvSpikes();
+  state.t++; updateMovers(); updateAdvSpikes(); updateMorphs();
   if(state.mode === 'play') updatePlayer();
   else if(state.mode === 'dead'){ state.deadTimer--; if(state.deadTimer <= 0) respawn(); }
   else if(state.mode === 'win') {
@@ -1166,8 +1267,6 @@ function drawAdvSpikes(layer){
     var rad = Math.max(s.w, s.h) / 2;
     ctx.save();
     ctx.translate(cx, cy);
-    if(s.morph === 'pulse'){ var scale = 1 + Math.sin(state.t * 0.1) * 0.2; ctx.scale(scale, scale); }
-    else if(s.morph === 'rotate'){ ctx.rotate(state.t * 0.05); }
     ctx.fillStyle = '#ff8c00';
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 1.5;
@@ -1276,10 +1375,10 @@ function render(){
   ctx.restore();
   drawHUD();
   
-  if(state.mode === 'dead'){ 
-    var a = (state.deadTimer / 28) * 0.35; 
-    ctx.fillStyle = 'rgba(233,69,96,' + a + ')'; 
-    ctx.fillRect(0,0,W,H); 
+  if(state.mode === 'dead'){
+    var a = (state.deadTimer / 28) * 0.35;
+    ctx.fillStyle = 'rgba(233,69,96,' + a + ')';
+    ctx.fillRect(0,0,W,H);
   }
 }
 
