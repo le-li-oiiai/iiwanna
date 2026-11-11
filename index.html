@@ -2,15 +2,17 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>I Wanna Shoot · 选关</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;width:100%;background:#05050c;color:#c8d0e8;
-    font-family:'Courier New',Consolas,monospace;font-size:13px;overflow:hidden;}
+    font-family:'Courier New',Consolas,monospace;font-size:13px;overflow:hidden;
+    overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}
 
   #menu{
     position:fixed;inset:0;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
     background:radial-gradient(circle at 50% 0%,#151535,#05050c 60%);
     z-index:100;
   }
@@ -42,6 +44,7 @@
     font-size:11px;transition:.13s;
   }
   .btn-sm:hover{background:#232340;border-color:#3d3d66;color:#fff;}
+  .btn-sm:active{transform:scale(.96);}
 
   .levels-grid{
     display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
@@ -62,6 +65,7 @@
     box-shadow:0 8px 24px rgba(94,234,212,.18);
   }
   .level-card:hover::before{opacity:1;}
+  .level-card:active{transform:scale(.97);}
   .card-badge{
     position:absolute;top:8px;right:8px;font-size:9px;letter-spacing:1px;
     padding:2px 6px;border-radius:3px;background:#1a1a2e;color:#6a7290;
@@ -100,6 +104,7 @@
     width:100%;background:#0a0a14;border:1px solid #26263f;color:#c8d0e8;
     padding:9px 11px;border-radius:6px;font-family:inherit;font-size:11px;
     resize:vertical;min-height:80px;outline:none;line-height:1.5;
+    touch-action:auto;-webkit-user-select:text;user-select:text;
   }
   textarea:focus{border-color:#3d3d66;background:#0f0f1e;}
 
@@ -107,8 +112,9 @@
     display:flex;gap:8px;margin-top:8px;align-items:stretch;
   }
   .row input{
-    flex:1;background:#0a0a14;border:1px solid #26263f;color:#c8d0e8;
+    flex:1;min-width:0;background:#0a0a14;border:1px solid #26263f;color:#c8d0e8;
     padding:8px 11px;border-radius:6px;font-family:inherit;font-size:12px;outline:none;
+    touch-action:auto;-webkit-user-select:text;user-select:text;
   }
   .row input:focus{border-color:#3d3d66;background:#0f0f1e;}
 
@@ -133,21 +139,39 @@
 
   #wrap{
     position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:min(100vw,177.78vh);aspect-ratio:960/540;
+    width:min(100vw,177.78vh);
+    width:min(100vw,177.78dvh);
+    aspect-ratio:960/540;
     box-shadow:0 0 80px rgba(90,130,255,.25),0 0 0 1px rgba(120,150,255,.15);
     border-radius:8px;overflow:hidden;display:none;
+    touch-action:none;
   }
   #wrap.visible{display:block;}
-  canvas{display:block;width:100%;height:100%;cursor:crosshair;}
+  canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none;}
+
+  .portrait-tip{
+    position:absolute;top:12px;left:50%;transform:translateX(-50%);
+    background:rgba(94,234,212,.15);border:1px solid rgba(94,234,212,.45);
+    color:#7dfbe1;padding:6px 16px;border-radius:20px;
+    font-size:12px;display:none;z-index:20;pointer-events:none;
+    white-space:nowrap;
+  }
+  @media (orientation: portrait){
+    #wrap.visible .portrait-tip{ display:block; }
+  }
 
   #exit-btn{
-    position:fixed;top:10px;right:12px;z-index:60;
+    position:fixed;
+    top:calc(10px + env(safe-area-inset-top, 0px));
+    right:calc(12px + env(safe-area-inset-right, 0px));
+    z-index:60;
     background:rgba(20,20,40,.85);color:#c8d0e8;border:1px solid #26263f;
-    padding:6px 12px;border-radius:6px;cursor:pointer;font-family:inherit;
-    font-size:11px;transition:.13s;display:none;backdrop-filter:blur(4px);
+    padding:8px 14px;border-radius:6px;cursor:pointer;font-family:inherit;
+    font-size:12px;transition:.13s;display:none;backdrop-filter:blur(4px);
   }
   #exit-btn.visible{display:block;}
   #exit-btn:hover{background:#252540;color:#fff;border-color:#3d3d66;}
+  #exit-btn:active{transform:scale(.95);}
 
   #win-overlay{
     position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;
@@ -172,6 +196,38 @@
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:#252540;border-radius:4px;}
   ::-webkit-scrollbar-thumb:hover{background:#343460;}
+
+  /* ---------- 小屏 / 手机适配 ---------- */
+  @media (max-width: 600px){
+    .menu-inner{ padding:18px 12px 28px; }
+    .menu-head{ margin-bottom:18px; }
+    .menu-head h1{ font-size:22px; letter-spacing:1px; }
+    .menu-head .sub{ font-size:10px; letter-spacing:2px; }
+    .section{ padding:12px 12px; border-radius:8px; margin-bottom:12px; }
+    .sec-head{ margin-bottom:10px; padding-bottom:8px; }
+    .sec-title{ font-size:10px; letter-spacing:2px; }
+    .btn-sm{ padding:7px 11px; font-size:12px; }
+    .levels-grid{ grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; }
+    .level-card{ min-height:68px; padding:11px 10px; border-radius:7px; }
+    .card-name{ font-size:12px; padding-right:36px; }
+    .card-badge{ font-size:8px; padding:1px 5px; top:6px; right:6px; }
+    .card-del{ width:24px; height:24px; font-size:12px; }
+    .hint-text{ font-size:10px; line-height:1.6; }
+    textarea{ font-size:16px; padding:10px 12px; min-height:70px; }
+    .row{ flex-wrap:wrap; gap:6px; }
+    .row input{ flex:1 1 100%; font-size:16px; padding:10px 12px; }
+    .row .btn{ flex:1 1 calc(50% - 3px); padding:11px 10px; font-size:13px; }
+    .menu-foot{ font-size:9px; margin-top:14px; }
+    .win-title{ font-size:40px; }
+    .win-sub{ font-size:15px; margin-bottom:28px; }
+    .win-actions{ gap:10px; }
+    .win-actions .btn{ padding:11px 18px; font-size:13px; }
+    #exit-btn{ padding:8px 12px; font-size:12px; }
+  }
+  @media (max-width: 380px){
+    .menu-head h1{ font-size:19px; }
+    .levels-grid{ grid-template-columns:1fr 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -217,6 +273,7 @@
 
 <div id="wrap">
   <canvas id="game"></canvas>
+  <div class="portrait-tip">📱 建议横屏游玩</div>
   <div id="win-overlay">
     <h2 class="win-title">🏆 YOU WIN!</h2>
     <div class="win-sub">死亡次数: <span id="win-deaths">0</span></div>
@@ -430,7 +487,6 @@ function loadAndStart(raw, displayName){
   }catch(e){
     wrapEl.classList.remove('visible');
     exitBtn.classList.remove('visible');
-    menuEl.classList.add('hidden');
     menuEl.classList.remove('hidden');
     alert('游戏启动失败：' + e.message);
   }
@@ -730,7 +786,7 @@ function normalizeLevel(d){
 }
 
 /* ============================================================
- *  游戏引擎（与编辑器内置模板保持一致）
+ *  游戏引擎（含手机触屏控制）
  * ============================================================ */
 function startGameEngine(cvs, L, onWinCallback){
 
@@ -841,6 +897,105 @@ function startGameEngine(cvs, L, onWinCallback){
   var keys = {};
   var mouse = { x: W*0.8, y: H/2, down: false };
 
+  /* ---------- 触屏控制状态 ---------- */
+  var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+
+  var touchState = { left: false, right: false, jump: false };
+  var touchAimActive = false;
+  var touchAimX = W * 0.8;
+  var touchAimY = H / 2;
+  var activeTouches = {};
+  var lastTouchTime = 0;
+
+  var TOUCH_BTN = {
+    left:  { x: 95,      y: H - 95, r: 54 },
+    right: { x: 218,     y: H - 95, r: 54 },
+    jump:  { x: W - 95,  y: H - 95, r: 58 }
+  };
+
+  function touchToLogic(t){
+    var r = cvs.getBoundingClientRect();
+    return {
+      x: (t.clientX - r.left) * (W / r.width),
+      y: (t.clientY - r.top)  * (H / r.height)
+    };
+  }
+  function inBtn(p, b){
+    var dx = p.x - b.x, dy = p.y - b.y;
+    var rr = b.r + 10;
+    return dx*dx + dy*dy <= rr*rr;
+  }
+  function refreshAimState(){
+    var hasAim = false;
+    for(var id in activeTouches){
+      if(activeTouches[id] === 'aim'){ hasAim = true; break; }
+    }
+    touchAimActive = hasAim;
+  }
+
+  function onTouchStart(e){
+    e.preventDefault();
+    lastTouchTime = Date.now();
+    initAudio();
+    for(var i = 0; i < e.changedTouches.length; i++){
+      var t = e.changedTouches[i];
+      var id = t.identifier;
+      if(activeTouches[id]) continue;
+      var p = touchToLogic(t);
+
+      if(inBtn(p, TOUCH_BTN.left)){
+        activeTouches[id] = 'left';
+        touchState.left = true;
+      } else if(inBtn(p, TOUCH_BTN.right)){
+        activeTouches[id] = 'right';
+        touchState.right = true;
+      } else if(inBtn(p, TOUCH_BTN.jump)){
+        activeTouches[id] = 'jump';
+        touchState.jump = true;
+        player.jumpBuffer = 8;
+      } else {
+        activeTouches[id] = 'aim';
+        touchAimX = p.x;
+        touchAimY = p.y;
+        refreshAimState();
+      }
+    }
+  }
+
+  function onTouchMove(e){
+    e.preventDefault();
+    lastTouchTime = Date.now();
+    for(var i = 0; i < e.changedTouches.length; i++){
+      var t = e.changedTouches[i];
+      if(activeTouches[t.identifier] === 'aim'){
+        var p = touchToLogic(t);
+        touchAimX = p.x;
+        touchAimY = p.y;
+      }
+    }
+  }
+
+  function onTouchEnd(e){
+    e.preventDefault();
+    lastTouchTime = Date.now();
+    for(var i = 0; i < e.changedTouches.length; i++){
+      var t = e.changedTouches[i];
+      var role = activeTouches[t.identifier];
+      if(!role) continue;
+      if(role === 'left')  touchState.left = false;
+      else if(role === 'right') touchState.right = false;
+      else if(role === 'jump')  touchState.jump = false;
+      delete activeTouches[t.identifier];
+    }
+    refreshAimState();
+  }
+
+  on(cvs, 'touchstart',  onTouchStart, { passive: false });
+  on(cvs, 'touchmove',   onTouchMove,  { passive: false });
+  on(cvs, 'touchend',    onTouchEnd,   { passive: false });
+  on(cvs, 'touchcancel', onTouchEnd,   { passive: false });
+
+  /* ---------- 键盘 ---------- */
   on(window, 'keydown', function(e){
     if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.code) >= 0) e.preventDefault();
     if(!keys[e.code]){
@@ -854,14 +1009,24 @@ function startGameEngine(cvs, L, onWinCallback){
   on(window, 'blur', function(){
     for(var k in keys) keys[k] = false;
     mouse.down = false;
+    touchState.left = touchState.right = touchState.jump = false;
+    touchAimActive = false;
+    activeTouches = {};
   });
 
+  /* ---------- 鼠标（触摸设备上忽略触摸后 400ms 内的模拟鼠标事件） ---------- */
   on(cvs, 'mousemove', function(e){
+    if(Date.now() - lastTouchTime < 400) return;
     var r = cvs.getBoundingClientRect();
     mouse.x = (e.clientX - r.left) * (W / r.width);
     mouse.y = (e.clientY - r.top)  * (H / r.height);
   });
-  on(cvs, 'mousedown', function(e){ mouse.down = true; initAudio(); e.preventDefault(); });
+  on(cvs, 'mousedown', function(e){
+    if(Date.now() - lastTouchTime < 400) return;
+    mouse.down = true;
+    initAudio();
+    e.preventDefault();
+  });
   on(window, 'mouseup', function(){ mouse.down = false; });
   on(cvs, 'contextmenu', function(e){ e.preventDefault(); });
 
@@ -1056,8 +1221,8 @@ function startGameEngine(cvs, L, onWinCallback){
     else if (p.fastTimer > 0) spdMod = 1.8;
 
     var ax = 0;
-    if(keys['ArrowLeft'] || keys['KeyA']) ax--;
-    if(keys['ArrowRight']|| keys['KeyD']) ax++;
+    if(keys['ArrowLeft'] || keys['KeyA'] || touchState.left) ax--;
+    if(keys['ArrowRight']|| keys['KeyD'] || touchState.right) ax++;
     if(ax !== 0){ p.vx += ax * 1.25 * spdMod; p.facing = ax; }
     else { p.vx *= 0.78; if(Math.abs(p.vx) < 0.15) p.vx = 0; }
     p.vx = clamp(p.vx, -4.6 * spdMod, 4.6 * spdMod);
@@ -1085,11 +1250,16 @@ function startGameEngine(cvs, L, onWinCallback){
 
     if(p.invTimer > 0) p.invTimer--;
 
-    var wmx = mouse.x + state.camX;
-    p.aimAngle = Math.atan2(mouse.y - (p.y + p.h/2), wmx - (p.x + p.w/2));
+    var aimX = touchAimActive ? touchAimX : mouse.x;
+    var aimY = touchAimActive ? touchAimY : mouse.y;
+    var wmx = aimX + state.camX;
+    p.aimAngle = Math.atan2(aimY - (p.y + p.h/2), wmx - (p.x + p.w/2));
 
     if(p.shootCd > 0) p.shootCd--;
-    if((mouse.down || keys['KeyJ']) && p.shootCd <= 0){ shoot(); p.shootCd = 9; }
+    if((mouse.down || keys['KeyJ'] || touchAimActive) && p.shootCd <= 0){
+      shoot();
+      p.shootCd = 9;
+    }
 
     checkHitboxTriggers();
     checkHazards();
@@ -1334,7 +1504,7 @@ function startGameEngine(cvs, L, onWinCallback){
   function checkHazards(){
     var p = player, i;
 
-    // 普通尖刺（内缩量按比例 clamp，避免小尖刺碰撞盒失效）
+    // 普通尖刺
     for(i=0;i<spikes.length;i++){
       var s = spikes[i];
       var spx = Math.min(3, s.w * 0.25), spy = Math.min(7, s.h * 0.4);
@@ -1921,7 +2091,11 @@ function startGameEngine(cvs, L, onWinCallback){
     ctx.fillStyle = 'rgba(160,180,220,0.55)';
     ctx.font = '13px "Courier New",monospace';
     ctx.textAlign = 'right';
-    ctx.fillText('A/D 移动 · SPACE 跳跃(二段) · 鼠标射击 · R 重来', W - 18, 32);
+    if (isTouchDevice) {
+      ctx.fillText('左侧移动 · 右侧点击射击 · ↑跳跃', W - 18, 32);
+    } else {
+      ctx.fillText('A/D 移动 · SPACE 跳跃(二段) · 鼠标射击 · R 重来', W - 18, 32);
+    }
 
     var prog = clamp(player.x / (goal.x || 1), 0, 1);
     ctx.fillStyle = 'rgba(255,255,255,0.08)';
@@ -1933,7 +2107,8 @@ function startGameEngine(cvs, L, onWinCallback){
     ctx.fillStyle = '#5eead4';
     ctx.beginPath(); ctx.arc(W/2 - 180 + 360*prog, H - 19.5, 4, 0, Math.PI*2); ctx.fill();
 
-    var mx = mouse.x, my = mouse.y;
+    var mx = touchAimActive ? touchAimX : mouse.x;
+    var my = touchAimActive ? touchAimY : mouse.y;
     ctx.strokeStyle = 'rgba(253,224,71,0.85)';
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.arc(mx, my, 9, 0, Math.PI*2); ctx.stroke();
@@ -1943,6 +2118,36 @@ function startGameEngine(cvs, L, onWinCallback){
     ctx.moveTo(mx, my - 15); ctx.lineTo(mx, my - 5);
     ctx.moveTo(mx, my + 5);  ctx.lineTo(mx, my + 15);
     ctx.stroke();
+  }
+
+  /* ---------- 触屏按钮绘制 ---------- */
+  function drawTouchButton(b, label, active, color){
+    ctx.save();
+
+    ctx.globalAlpha = active ? 0.55 : 0.2;
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
+
+    ctx.globalAlpha = active ? 1 : 0.5;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.stroke();
+
+    ctx.globalAlpha = active ? 1 : 0.75;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold ' + Math.round(b.r * 0.95) + 'px -apple-system, "Segoe UI", "PingFang SC", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, b.x, b.y + 2);
+
+    ctx.restore();
+  }
+
+  function drawTouchControls(){
+    if(!isTouchDevice) return;
+    drawTouchButton(TOUCH_BTN.left,  '◀', touchState.left,  '#5eead4');
+    drawTouchButton(TOUCH_BTN.right, '▶', touchState.right, '#5eead4');
+    drawTouchButton(TOUCH_BTN.jump,  '↑', touchState.jump,  '#a78bfa');
   }
 
   function drawDeadOverlay(){
@@ -1976,6 +2181,7 @@ function startGameEngine(cvs, L, onWinCallback){
 
     drawHUD();
     drawDeadOverlay();
+    drawTouchControls();
   }
 
   /* ---------- 主循环 ---------- */
