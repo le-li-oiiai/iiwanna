@@ -89,7 +89,7 @@
 
   .status{
     margin-top:10px;font-size:11px;color:#4a5270;text-align:center;
-    min-height:16px;line-height:1.4;
+    min-height:16px;line-height:1.4;word-break:break-all;
   }
   .status.error{color:#e94560;}
 
@@ -181,8 +181,8 @@
         <span class="sec-title">添加关卡</span>
       </div>
       <p class="hint-text">
-        把 <kbd>.json</kbd> 关卡文件放到与本页面相同的目录，刷新页面即可自动出现在列表中（GitHub Pages 会自动扫描）。<br>
-        也可以直接粘贴编辑器导出的 JSON 文本保存到浏览器本地，仅供本机游玩。
+        想分享关卡给朋友？把 <kbd>.json</kbd> 文件上传到本页面同目录，并在 <kbd>levels.json</kbd> 里登记。<br>
+        或者直接粘贴文本保存在你的浏览器本地。
       </p>
       <textarea id="paste-box" placeholder="粘贴编辑器导出的关卡 JSON 文本..."></textarea>
       <div class="row">
@@ -245,94 +245,35 @@ function removeLocalLevel(id){
 }
 
 /* ============================================================
-   GitHub 仓库自动检测 + API 扫描
+   读取在线关卡列表
    ============================================================ */
-function detectRepo(){
-  var host = location.hostname;
-  if(!/\.github\.io$/i.test(host)) return null;
-  var owner = host.replace(/\.github\.io$/i, '');
-  var parts = location.pathname.split('/').filter(Boolean);
-
-  // https://user.github.io/            → repo = user.github.io
-  if(parts.length === 0) return { owner: owner, repo: host, dir: '' };
-
-  var last = parts[parts.length - 1];
-  var isHtml = /\.html?$/i.test(last);
-
-  if(parts.length === 1){
-    // https://user.github.io/play.html  → repo = user.github.io
-    return { owner: owner, repo: host, dir: '' };
-  }
-  // https://user.github.io/repo/...    → repo = repo
-  if(isHtml){
-    return { owner: owner, repo: parts[0], dir: parts.slice(1, -1).join('/') };
-  } else {
-    return { owner: owner, repo: parts[0], dir: parts.slice(1).join('/') };
-  }
-}
-
-/* 尝试读取 levels.json（可选，用来手动维护列表 / 自定义显示名 / 自定义域名的情况） */
-function tryLevelsIndex(){
+function fetchOnlineLevels(){
+  // 强制加时间戳避免浏览器缓存
   return fetch('levels.json?_=' + Date.now())
     .then(function(r){
-      if(!r.ok) return null;
+      if(!r.ok) throw new Error('找不到 levels.json 文件 (HTTP ' + r.status + ')');
       return r.json();
     })
     .then(function(arr){
-      if(!Array.isArray(arr)) return null;
-      return arr
-        .filter(function(x){ return x && (typeof x === 'string' || x.file || x.url); })
-        .map(function(x){
-          if(typeof x === 'string') return { type:'remote', name: x.replace(/\.json$/i,''), url: x };
-          return { type:'remote', name: x.name || x.file || x.url, url: x.url || x.file };
-        });
-    })
-    .catch(function(){ return null; });
-}
-
-/* 用 GitHub API 扫描当前目录下所有 .json */
-function scanGithub(){
-  var repo = detectRepo();
-  if(!repo) return Promise.resolve(null);
-
-  var cacheKey = 'iwsl_gh_' + repo.owner + '_' + repo.repo + '_' + repo.dir;
-  try{
-    var cached = sessionStorage.getItem(cacheKey);
-    if(cached){
-      var obj = JSON.parse(cached);
-      if(Date.now() - obj.t < 5 * 60 * 1000) return Promise.resolve(obj.list);
-    }
-  }catch(e){}
-
-  var apiUrl = 'https://api.github.com/repos/' + repo.owner + '/' + repo.repo +
-               '/contents/' + encodeURIComponent(repo.dir).replace(/%2F/g, '/');
-
-  return fetch(apiUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } })
-    .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(function(data){
-      if(!Array.isArray(data)) return [];
-      var list = data
-        .filter(function(f){
-          return f.type === 'file' && /\.json$/i.test(f.name) && f.name.toLowerCase() !== 'levels.json';
-        })
-        .map(function(f){
-          return {
-            type: 'remote',
-            name: f.name.replace(/\.json$/i, ''),
-            url: f.download_url || f.name
-          };
-        });
-      try{ sessionStorage.setItem(cacheKey, JSON.stringify({ t: Date.now(), list: list })); }catch(e){}
+      if(!Array.isArray(arr)) throw new Error('levels.json 格式错误：必须是一个数组 []');
+      
+      var list = [];
+      arr.forEach(function(item){
+        if(typeof item === 'string'){
+          list.push({ type:'remote', name: item.replace(/\.json$/i,''), url: item });
+        } else if(item && (item.file || item.url)){
+          list.push({ type:'remote', name: item.name || item.file || item.url, url: item.url || item.file });
+        }
+      });
       return list;
-    })
-    .catch(function(){ return null; });
+    });
 }
 
 /* ============================================================
    选关列表渲染
    ============================================================ */
 function refreshLevelList(){
-  statusEl.textContent = '正在扫描关卡...';
+  statusEl.textContent = '正在读取关卡列表...';
   statusEl.classList.remove('error');
   gridEl.innerHTML = '';
 
@@ -340,35 +281,38 @@ function refreshLevelList(){
     return { type:'local', id:x.id, name:x.name };
   });
 
-  // 优先 levels.json，其次 GitHub API
-  tryLevelsIndex().then(function(idxList){
-    if(idxList && idxList.length > 0) return { source: 'index', list: idxList };
-    return scanGithub().then(function(ghList){
-      return { source: ghList ? 'github' : 'none', list: ghList || [] };
-    });
-  }).then(function(result){
-    var remote = result.list;
-    var all = local.concat(remote);
+  fetchOnlineLevels()
+    .then(function(remoteList){
+      var all = local.concat(remoteList);
 
-    if(all.length === 0){
-      gridEl.innerHTML =
-        '<div class="empty-tip">还没有可用的关卡<br>' +
-        '<span>把 JSON 文件放到本页面同目录，或粘贴到下方保存</span></div>';
-      if(result.source === 'none' && !detectRepo()){
-        statusEl.textContent = '未检测到 GitHub Pages 环境，无法自动扫描。可用粘贴方式添加关卡，或用 ?level=xxx.json 直接游玩。';
-      } else {
+      if(all.length === 0){
+        gridEl.innerHTML =
+          '<div class="empty-tip">还没有可用的关卡<br>' +
+          '<span>请检查 levels.json 是否有内容，或粘贴到下方保存</span></div>';
         statusEl.textContent = '';
+        return;
       }
-      return;
-    }
 
-    statusEl.textContent =
-      '共 ' + all.length + ' 个关卡（本地 ' + local.length + ' · 在线 ' + remote.length + '）';
+      statusEl.textContent =
+        '共 ' + all.length + ' 个关卡（本地 ' + local.length + ' · 在线 ' + remoteList.length + '）';
 
-    all.forEach(function(item){
-      gridEl.appendChild(buildLevelCard(item));
+      all.forEach(function(item){
+        gridEl.appendChild(buildLevelCard(item));
+      });
+    })
+    .catch(function(err){
+      // 如果在线获取失败（比如还在本地测试），依然显示本地关卡
+      if(local.length > 0){
+        local.forEach(function(item){ gridEl.appendChild(buildLevelCard(item)); });
+        statusEl.textContent = '在线列表获取失败：' + err.message + '（仅显示本地关卡）';
+      } else {
+        gridEl.innerHTML =
+          '<div class="empty-tip">未能加载在线关卡<br>' +
+          '<span>请确保 index.html 同目录下存在 levels.json 且格式正确</span></div>';
+        statusEl.textContent = '加载失败：' + err.message;
+      }
+      statusEl.classList.add('error');
     });
-  });
 }
 
 function buildLevelCard(item){
@@ -418,13 +362,16 @@ function enterLevel(item){
     loadAndStart(txt, item.name);
     return;
   }
+  
   statusEl.textContent = '正在加载「' + item.name + '」...';
   statusEl.classList.remove('error');
-  fetch(item.url)
+  
+  // 避免浏览器缓存关卡文件
+  fetch(item.url + '?_=' + Date.now())
     .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
     .then(function(txt){ loadAndStart(txt, item.name); })
     .catch(function(e){
-      statusEl.textContent = '加载失败：' + e.message;
+      statusEl.textContent = '关卡加载失败：' + e.message;
       statusEl.classList.add('error');
     });
 }
@@ -432,13 +379,12 @@ function enterLevel(item){
 function loadAndStart(raw, displayName){
   var data;
   try{ data = JSON.parse(raw); }
-  catch(e){ alert('JSON 解析失败：' + e.message); return; }
+  catch(e){ alert('关卡 JSON 解析失败：' + e.message); return; }
 
   var level;
   try{ level = normalizeLevel(data); }
-  catch(e){ alert(e.message); return; }
+  catch(e){ alert('关卡数据格式不正确：' + e.message); return; }
 
-  // 停掉旧游戏并清理
   if(currentGame){ try{ currentGame.stop(); }catch(e){} currentGame = null; }
 
   // 用全新的 canvas，彻底避免旧事件残留
@@ -447,7 +393,6 @@ function loadAndStart(raw, displayName){
   newCvs.id = 'game';
   oldCvs.parentNode.replaceChild(newCvs, oldCvs);
 
-  // 切换到游戏视图
   menuEl.classList.add('hidden');
   wrapEl.classList.add('visible');
   exitBtn.classList.add('visible');
@@ -455,7 +400,6 @@ function loadAndStart(raw, displayName){
   try{
     currentGame = startGameEngine(newCvs, level);
   }catch(e){
-    // 若启动失败则退回菜单
     wrapEl.classList.remove('visible');
     exitBtn.classList.remove('visible');
     menuEl.classList.remove('hidden');
@@ -516,13 +460,7 @@ $('btn-download').addEventListener('click', function(){
   }, 200);
 });
 
-$('btn-refresh').addEventListener('click', function(){
-  try{
-    var repo = detectRepo();
-    if(repo) sessionStorage.removeItem('iwsl_gh_' + repo.owner + '_' + repo.repo + '_' + repo.dir);
-  }catch(e){}
-  refreshLevelList();
-});
+$('btn-refresh').addEventListener('click', refreshLevelList);
 
 /* ============================================================
    关卡规范化
@@ -623,7 +561,7 @@ function normalizeLevel(d){
 }
 
 /* ============================================================
-   游戏引擎（支持 stop 以便退回菜单）
+   游戏引擎
    ============================================================ */
 function startGameEngine(cvs, L){
 
@@ -1251,15 +1189,6 @@ return {
         statusEl.classList.add('error');
       });
     return;
-  }
-
-  // 支持 #<base64> 分享
-  var hash = location.hash.slice(1);
-  if(hash){
-    try{
-      var decoded = decodeURIComponent(escape(atob(decodeURIComponent(hash))));
-      loadAndStart(decoded, '分享关卡');
-    }catch(e){}
   }
 })();
 
